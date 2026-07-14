@@ -28,6 +28,18 @@ VER-WEB.bat            # o: cd dist && python -m http.server 8123
 | `prensa/wikidata-spec.md` | Especificación del ítem de Wikidata con referencias |
 | `dist/` | Salida generada (no se versiona: `python build.py`) |
 
+## Publicar (despliegue Git de Hostinger)
+
+La rama **`web-dist`** contiene la web ya construida — es la que Hostinger sirve
+(hPanel → Avanzado → GIT, rama `web-dist`). Para actualizarla tras cambiar algo en `web`:
+
+```bash
+python build.py
+git worktree add ../wt web-dist
+# vaciar y copiar: (desde ../wt) git rm -rf . -q  &&  cp -r ../baydal/dist/. .
+# commit + push en ../wt, y después: git worktree remove ../wt
+```
+
 ## Contexto del proyecto
 
 - Auditoría de la web actual: [informe](https://claude.ai/code/artifact/4e66de0f-45ca-488a-a259-374cb42ae799)
