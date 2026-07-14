@@ -1,0 +1,16 @@
+# generado por build.py — se regenera con: python build.py
+dist/
+
+# material de vídeo pesado (se baja de Drive, no se versiona)
+video-src/
+
+# credenciales locales (nunca al repo)
+.mcp-baydal.txt
+.ftp-credentials
+*.env
+
+# temporales
+__pycache__/
+b64_*
+fotos_tmp/
+*.log
