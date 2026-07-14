@@ -14,3 +14,4 @@ __pycache__/
 b64_*
 fotos_tmp/
 *.log
+dist.zip
