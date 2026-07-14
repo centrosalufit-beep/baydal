@@ -1,0 +1,2 @@
+Salida generada de la web de baydal.es — NO editar a mano.
+Se regenera desde la rama web: python build.py, y se vuelca aquí.

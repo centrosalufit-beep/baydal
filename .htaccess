@@ -1,0 +1,14 @@
+# Redirecciones 301 baydal.es: WordPress viejo → sitio estático. Generado por build.py.
+RewriteEngine On
+RewriteRule ^nuestra-historia/?$              /historia/     [R=301,L]
+RewriteRule ^aviso-legal-imprint/?$           /aviso-legal/  [R=301,L]
+RewriteRule ^declaracion-de-privacidad-ue/?$  /privacidad/   [R=301,L]
+RewriteRule ^politica-de-cookies-ue/?$        /cookies/      [R=301,L]
+RewriteRule ^terminos-y-condiciones/?$        /aviso-legal/  [R=301,L]
+RewriteRule ^descargo-de-responsabilidad/?$   /aviso-legal/  [R=301,L]
+RewriteRule ^accesibilidad/?$                 /aviso-legal/  [R=301,L]
+RewriteRule ^menu-item/                       /carta/        [R=301,L]
+RewriteRule ^menu-section/                    /carta/        [R=301,L]
+RewriteRule ^fdm-menu-section/                /carta/        [R=301,L]
+RewriteRule ^menu/                            /carta/        [R=301,L]
+RewriteRule ^carta/[^/]+/?$                   /carta/        [R=301,L]
