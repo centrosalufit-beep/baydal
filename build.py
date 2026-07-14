@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Generador estático de baydal.es — 7 páginas × 4 idiomas desde una fuente de datos.
+"""Generador estático de baydal.es — 11 páginas × 4 idiomas desde una fuente de datos.
 Uso: python build.py  (escribe el sitio en ./dist)
 Fuente de la carta: Google Sheets mayo 2026 (ES/DE/FR) + traducción EN propia.
 """
@@ -14,6 +14,12 @@ WA = "34677490049"
 # Dirección oficial confirmada por David 13/07/2026 (Google/IG/Yelp dicen 12: corregirlos allí, no copiarlos)
 ADDRESS = "Avinguda del Port, 10"
 GEO = (38.6366, 0.0706)
+# Identidad fiscal para el aviso legal (LSSI art. 10). La S.L. tiene domicilio social en el 12
+# (lo que consta en el CIF); el local está en el 10. No es contradicción: son cosas distintas.
+RS = "Baydal Tours, S.L."
+CIF = "B-03412301"
+DOM_SOCIAL = "Av. del Puerto, 12"
+EMAIL = "restaurantebaydal@gmail.com"
 
 LANGS = ["es", "en", "de", "fr"]
 
@@ -27,6 +33,9 @@ PATHS = {
     "reservas": {"es": "/reservas/",           "en": "/en/book/",         "de": "/de/reservieren/",  "fr": "/fr/reserver/"},
     "visitenos":{"es": "/visitenos/",          "en": "/en/find-us/",      "de": "/de/anfahrt/",      "fr": "/fr/venir/"},
     "lonja":    {"es": "/lonja-de-calp/",      "en": "/en/fish-auction/", "de": "/de/fischauktion/", "fr": "/fr/criee-de-calpe/"},
+    "aviso-legal":{"es":"/aviso-legal/",       "en":"/en/legal-notice/",  "de":"/de/impressum/",     "fr":"/fr/mentions-legales/"},
+    "privacidad": {"es":"/privacidad/",         "en":"/en/privacy/",       "de":"/de/datenschutz/",   "fr":"/fr/confidentialite/"},
+    "cookies":    {"es":"/cookies/",            "en":"/en/cookies/",       "de":"/de/cookies/",       "fr":"/fr/cookies/"},
 }
 
 T = {
@@ -559,6 +568,8 @@ def layout(lang, page, title, desc, body, extra_head=""):
         f'<li><a href="{u(k,lang)}"{" class=\"on\"" if k==page else ""}>{t["nav"][n]}</a></li>'
         for k, n in [("carta","carta"),("senyoret","senyoret"),("historia","historia"),("galeria","galeria"),("visitenos","visitenos")])
     lang_sw = " · ".join(f'<a href="{u(page,l)}"{" aria-current=\"true\"" if l==lang else ""}>{l.upper()}</a>' for l in LANGS)
+    ft_legal = " · ".join(f'<a href="{u(p,lang)}">{lbl}</a>'
+                          for p, lbl in zip(("aviso-legal","privacidad","cookies"), t["footer_legal"].split(" · ")))
     return f"""<!DOCTYPE html>
 <html lang="{lang}">
 <head>
@@ -610,7 +621,7 @@ def layout(lang, page, title, desc, body, extra_head=""):
       <p class="ft-soc"><a href="https://www.instagram.com/restaurantebaydal" rel="noopener">Instagram</a> · <a href="https://www.facebook.com/rtebaydal" rel="noopener">Facebook</a></p>
     </div>
   </div>
-  <p class="ft-legal">© Restaurante Baydal · {t['since']} · {t['footer_legal']}</p>
+  <p class="ft-legal">© Restaurante Baydal · {t['since']} · {ft_legal}</p>
 </footer>
 <script src="/assets/js/main.js" defer></script>
 </body>
@@ -803,6 +814,7 @@ def page_reservas(lang):
 def page_visitenos(lang):
     t = T[lang]
     title, desc = t["meta_visit"]
+    map_load = {"es":"Ver el mapa 📍","en":"Show the map 📍","de":"Karte anzeigen 📍","fr":"Voir la carte 📍"}[lang]
     body = f"""
 <section class="page-head"><h1>{t['visit_h1']}</h1><p class="sub">{t['visit_p']}</p></section>
 <section class="visit">
@@ -813,7 +825,7 @@ def page_visitenos(lang):
     <p>{t['visit_parking']}<br>{t['visit_lonja']} — <a href="{u('lonja',lang)}">{EXTRA[lang]['lonja_link']}</a></p>
     <p><a class="cta ghost" href="https://www.google.com/maps/dir/?api=1&destination=Restaurante+Baydal+Calpe" rel="noopener">{t['map_cta']}</a></p>
   </div>
-  <div class="visit-map"><iframe src="https://www.google.com/maps?q=Restaurante%20Baydal%20Calpe&z=17&output=embed" title="Google Maps – Restaurante Baydal" loading="lazy" allowfullscreen></iframe></div>
+  <div class="visit-map"><button type="button" class="map-facade" data-map="https://www.google.com/maps?q=Restaurante%20Baydal%20Calpe&amp;z=17&amp;output=embed">{map_load}</button></div>
 </section>
 <section class="hist-hero">{img('fachada-baydal','Restaurante Baydal, Avinguda del Port, Calp',1884,724)}</section>"""
     return layout(lang, "visitenos", title, desc, body)
@@ -843,8 +855,110 @@ def page_lonja(lang):
     return layout(lang, "lonja", title, desc, body)
 
 
+# --- Páginas legales (LSSI + RGPD). Textos por idioma; los datos fiscales salen de las constantes. ---
+def _identity(labels):
+    rows = [(labels[0], RS), (labels[1], "Restaurante Baydal"), (labels[2], CIF),
+            (labels[3], f"{DOM_SOCIAL}, 03710 Calp (Alicante), España"),
+            (labels[4], f"{ADDRESS}, 03710 Calp (Alicante)"),
+            (labels[5], f'<a href="tel:{TEL}">{TEL_VISIBLE}</a>'),
+            (labels[6], f'<a href="mailto:{EMAIL}">{EMAIL}</a>')]
+    return '<ul class="legal-id">' + "".join(f"<li><strong>{k}:</strong> {v}</li>" for k, v in rows) + "</ul>"
+
+LEG = {
+"es": {
+ "meta": {"aviso-legal":("Aviso legal | Restaurante Baydal","Datos del titular de baydal.es conforme a la LSSI: Baydal Tours, S.L., CIF y domicilio."),
+          "privacidad":("Política de privacidad | Restaurante Baydal","Cómo tratamos tus datos en baydal.es conforme al RGPD. Sitio sin cookies ni almacenamiento de datos."),
+          "cookies":("Política de cookies | Restaurante Baydal","Esta web no utiliza cookies propias ni de terceros.")},
+ "id_labels": ["Denominación","Nombre comercial","CIF","Domicilio social","Establecimiento","Teléfono","Correo electrónico"],
+ "aviso": [("Titular del sitio web","En cumplimiento del artículo 10 de la Ley 34/2002, de servicios de la sociedad de la información y de comercio electrónico (LSSI-CE), se informa de los datos del titular de este sitio web:", True),
+           ("Objeto","Este sitio web tiene carácter meramente informativo sobre el restaurante, su carta, su historia y su ubicación. No se realizan ventas ni pagos en línea.", False),
+           ("Propiedad intelectual","Los contenidos de este sitio (textos, fotografías, logotipos y diseño) son titularidad de Baydal Tours, S.L. o se utilizan con la debida autorización. Queda prohibida su reproducción, distribución o transformación sin consentimiento expreso.", False),
+           ("Responsabilidad","El titular no se responsabiliza del uso indebido de los contenidos ni del contenido de sitios de terceros enlazados desde esta web.", False),
+           ("Legislación aplicable","Este aviso legal se rige por la legislación española. Para la resolución de cualquier controversia, las partes se someten a los juzgados y tribunales que correspondan conforme a derecho.", False)],
+ "priv": [("Responsable del tratamiento", f"Baydal Tours, S.L. (CIF {CIF}), con domicilio en {DOM_SOCIAL}, 03710 Calp (Alicante), correo <a href=\"mailto:{EMAIL}\">{EMAIL}</a>.", False),
+          ("Qué datos tratamos","Este sitio web es estático y no almacena datos personales en servidores propios. El formulario de reservas no envía datos a esta web: al pulsar «enviar», se abre WhatsApp en tu dispositivo con el mensaje que has redactado (nombre, fecha, hora y número de personas), que envías tú directamente. Ese envío se rige por la política de privacidad de WhatsApp/Meta.", False),
+          ("Finalidad y legitimación","Si nos contactas por teléfono, correo electrónico o WhatsApp, tratamos tus datos únicamente para atender tu reserva o consulta, sobre la base de tu consentimiento y de la relación precontractual. No cedemos tus datos a terceros ni los utilizamos con fines publicitarios.", False),
+          ("Conservación","Conservamos tus datos el tiempo necesario para gestionar tu reserva o consulta y, posteriormente, durante los plazos legalmente exigibles.", False),
+          ("Tus derechos", f"Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a <a href=\"mailto:{EMAIL}\">{EMAIL}</a>. Si consideras que no hemos atendido correctamente tu solicitud, puedes reclamar ante la Agencia Española de Protección de Datos (<a href=\"https://www.aepd.es\" rel=\"noopener\">www.aepd.es</a>).", False)],
+ "cookies": [("Esta web no utiliza cookies","No utilizamos cookies propias ni de terceros para analítica, publicidad ni seguimiento. Puedes navegar por todo el sitio sin que se instale ninguna cookie.", False),
+             ("Contenido externo","El mapa de Google y los vídeos no se cargan al abrir la página: solo se cargan si pulsas sobre ellos. En ese momento —y solo entonces— el proveedor correspondiente (Google, YouTube o Facebook) puede instalar sus propias cookies, sujetas a sus respectivas políticas. Si no pulsas, no se instala nada.", False)],
+},
+"en": {
+ "meta": {"aviso-legal":("Legal notice | Restaurante Baydal","Owner details for baydal.es under Spanish LSSI law: Baydal Tours, S.L., tax ID and registered address."),
+          "privacidad":("Privacy policy | Restaurante Baydal","How we handle your data on baydal.es under the GDPR. A site with no cookies and no data storage."),
+          "cookies":("Cookie policy | Restaurante Baydal","This website uses no first- or third-party cookies.")},
+ "id_labels": ["Company name","Trade name","Tax ID (CIF)","Registered office","Premises","Phone","Email"],
+ "aviso": [("Website owner","In accordance with Article 10 of Spanish Law 34/2002 on information society services and e-commerce (LSSI-CE), the owner of this website is:", True),
+           ("Purpose","This website is purely informational, covering the restaurant, its menu, its history and its location. No online sales or payments take place.", False),
+           ("Intellectual property","The contents of this site (texts, photographs, logos and design) belong to Baydal Tours, S.L. or are used with permission. Their reproduction, distribution or modification without express consent is prohibited.", False),
+           ("Liability","The owner is not liable for any misuse of the contents or for the content of third-party sites linked from this website.", False),
+           ("Applicable law","This legal notice is governed by Spanish law. Any dispute shall be submitted to the courts and tribunals designated by applicable law.", False)],
+ "priv": [("Data controller", f"Baydal Tours, S.L. (tax ID {CIF}), registered at {DOM_SOCIAL}, 03710 Calp (Alicante), Spain, email <a href=\"mailto:{EMAIL}\">{EMAIL}</a>.", False),
+          ("What data we process","This website is static and stores no personal data on its own servers. The booking form does not send data to this site: when you press «send», WhatsApp opens on your device with the message you wrote (name, date, time and number of guests), which you send yourself. That transmission is governed by the WhatsApp/Meta privacy policy.", False),
+          ("Purpose and legal basis","If you contact us by phone, email or WhatsApp, we process your data solely to handle your booking or enquiry, on the basis of your consent and the pre-contractual relationship. We do not share your data with third parties or use it for advertising.", False),
+          ("Retention","We keep your data for as long as needed to handle your booking or enquiry and thereafter for any legally required periods.", False),
+          ("Your rights", f"You may exercise your rights of access, rectification, erasure, objection, restriction and portability by writing to <a href=\"mailto:{EMAIL}\">{EMAIL}</a>. If you believe your request was not handled properly, you may lodge a complaint with the Spanish Data Protection Agency (<a href=\"https://www.aepd.es\" rel=\"noopener\">www.aepd.es</a>).", False)],
+ "cookies": [("This website uses no cookies","We use no first- or third-party cookies for analytics, advertising or tracking. You can browse the whole site without any cookie being set.", False),
+             ("External content","The Google map and the videos do not load when the page opens: they load only if you click on them. At that point —and only then— the relevant provider (Google, YouTube or Facebook) may set its own cookies, subject to their policies. If you do not click, nothing is set.", False)],
+},
+"de": {
+ "meta": {"aviso-legal":("Impressum | Restaurante Baydal","Anbieterangaben für baydal.es nach spanischem LSSI-Recht: Baydal Tours, S.L., Steuernummer und Sitz."),
+          "privacidad":("Datenschutzerklärung | Restaurante Baydal","Wie wir Ihre Daten auf baydal.es gemäß DSGVO behandeln. Eine Website ohne Cookies und ohne Datenspeicherung."),
+          "cookies":("Cookie-Richtlinie | Restaurante Baydal","Diese Website verwendet keine eigenen Cookies oder Cookies Dritter.")},
+ "id_labels": ["Firma","Handelsname","Steuernummer (CIF)","Sitz","Betriebsstätte","Telefon","E-Mail"],
+ "aviso": [("Anbieter der Website","Gemäß Artikel 10 des spanischen Gesetzes 34/2002 über Dienste der Informationsgesellschaft und elektronischen Geschäftsverkehr (LSSI-CE) wird über den Anbieter dieser Website informiert:", True),
+           ("Zweck","Diese Website dient ausschließlich der Information über das Restaurant, seine Speisekarte, seine Geschichte und seinen Standort. Es finden kein Online-Verkauf und keine Online-Zahlungen statt.", False),
+           ("Urheberrecht","Die Inhalte dieser Website (Texte, Fotos, Logos und Gestaltung) gehören Baydal Tours, S.L. oder werden mit entsprechender Genehmigung genutzt. Ihre Vervielfältigung, Verbreitung oder Bearbeitung ohne ausdrückliche Zustimmung ist untersagt.", False),
+           ("Haftung","Der Anbieter haftet nicht für den missbräuchlichen Gebrauch der Inhalte noch für die Inhalte verlinkter Websites Dritter.", False),
+           ("Anwendbares Recht","Dieses Impressum unterliegt spanischem Recht. Für die Beilegung etwaiger Streitigkeiten sind die gesetzlich zuständigen Gerichte maßgeblich.", False)],
+ "priv": [("Verantwortlicher", f"Baydal Tours, S.L. (Steuernummer {CIF}), mit Sitz in {DOM_SOCIAL}, 03710 Calp (Alicante), Spanien, E-Mail <a href=\"mailto:{EMAIL}\">{EMAIL}</a>.", False),
+          ("Welche Daten wir verarbeiten","Diese Website ist statisch und speichert keine personenbezogenen Daten auf eigenen Servern. Das Reservierungsformular sendet keine Daten an diese Website: Beim Klick auf «senden» öffnet sich WhatsApp auf Ihrem Gerät mit der von Ihnen verfassten Nachricht (Name, Datum, Uhrzeit und Personenzahl), die Sie selbst absenden. Diese Übermittlung unterliegt der Datenschutzerklärung von WhatsApp/Meta.", False),
+          ("Zweck und Rechtsgrundlage","Wenn Sie uns per Telefon, E-Mail oder WhatsApp kontaktieren, verarbeiten wir Ihre Daten ausschließlich zur Bearbeitung Ihrer Reservierung oder Anfrage, auf Grundlage Ihrer Einwilligung und des vorvertraglichen Verhältnisses. Wir geben Ihre Daten nicht an Dritte weiter und nutzen sie nicht für Werbung.", False),
+          ("Speicherdauer","Wir speichern Ihre Daten so lange, wie es zur Bearbeitung Ihrer Reservierung oder Anfrage erforderlich ist, und danach für die gesetzlich vorgeschriebenen Fristen.", False),
+          ("Ihre Rechte", f"Sie können Ihre Rechte auf Auskunft, Berichtigung, Löschung, Widerspruch, Einschränkung und Übertragbarkeit ausüben, indem Sie an <a href=\"mailto:{EMAIL}\">{EMAIL}</a> schreiben. Sind Sie der Ansicht, dass Ihre Anfrage nicht korrekt bearbeitet wurde, können Sie sich bei der spanischen Datenschutzbehörde beschweren (<a href=\"https://www.aepd.es\" rel=\"noopener\">www.aepd.es</a>).", False)],
+ "cookies": [("Diese Website verwendet keine Cookies","Wir verwenden keine eigenen Cookies oder Cookies Dritter für Analyse, Werbung oder Tracking. Sie können die gesamte Website nutzen, ohne dass ein Cookie gesetzt wird.", False),
+             ("Externe Inhalte","Die Google-Karte und die Videos werden beim Öffnen der Seite nicht geladen: Sie werden nur geladen, wenn Sie darauf klicken. In diesem Moment —und nur dann— kann der jeweilige Anbieter (Google, YouTube oder Facebook) eigene Cookies setzen, die deren Richtlinien unterliegen. Klicken Sie nicht, wird nichts gesetzt.", False)],
+},
+"fr": {
+ "meta": {"aviso-legal":("Mentions légales | Restaurante Baydal","Coordonnées du titulaire de baydal.es selon la loi espagnole LSSI : Baydal Tours, S.L., numéro fiscal et siège."),
+          "privacidad":("Politique de confidentialité | Restaurante Baydal","Comment nous traitons vos données sur baydal.es selon le RGPD. Un site sans cookies et sans stockage de données."),
+          "cookies":("Politique de cookies | Restaurante Baydal","Ce site n'utilise aucun cookie propre ni tiers.")},
+ "id_labels": ["Dénomination","Nom commercial","Numéro fiscal (CIF)","Siège social","Établissement","Téléphone","Courriel"],
+ "aviso": [("Titulaire du site","Conformément à l'article 10 de la loi espagnole 34/2002 sur les services de la société de l'information et le commerce électronique (LSSI-CE), voici les données du titulaire de ce site :", True),
+           ("Objet","Ce site a un caractère purement informatif sur le restaurant, sa carte, son histoire et son emplacement. Aucune vente ni aucun paiement en ligne n'y sont réalisés.", False),
+           ("Propriété intellectuelle","Les contenus de ce site (textes, photographies, logos et design) appartiennent à Baydal Tours, S.L. ou sont utilisés avec l'autorisation requise. Leur reproduction, distribution ou transformation sans consentement exprès est interdite.", False),
+           ("Responsabilité","Le titulaire n'est pas responsable de l'usage abusif des contenus ni du contenu des sites tiers liés depuis ce site.", False),
+           ("Droit applicable","Les présentes mentions légales sont régies par le droit espagnol. Tout litige sera soumis aux juridictions compétentes selon la loi.", False)],
+ "priv": [("Responsable du traitement", f"Baydal Tours, S.L. (numéro fiscal {CIF}), dont le siège est à {DOM_SOCIAL}, 03710 Calp (Alicante), Espagne, courriel <a href=\"mailto:{EMAIL}\">{EMAIL}</a>.", False),
+          ("Quelles données nous traitons","Ce site est statique et ne stocke aucune donnée personnelle sur ses propres serveurs. Le formulaire de réservation n'envoie pas de données à ce site : en cliquant sur «envoyer», WhatsApp s'ouvre sur votre appareil avec le message que vous avez rédigé (nom, date, heure et nombre de personnes), que vous envoyez vous-même. Cet envoi est régi par la politique de confidentialité de WhatsApp/Meta.", False),
+          ("Finalité et base légale","Si vous nous contactez par téléphone, courriel ou WhatsApp, nous traitons vos données uniquement pour gérer votre réservation ou demande, sur la base de votre consentement et de la relation précontractuelle. Nous ne cédons pas vos données à des tiers et ne les utilisons pas à des fins publicitaires.", False),
+          ("Conservation","Nous conservons vos données le temps nécessaire pour gérer votre réservation ou demande, puis pendant les délais légalement exigibles.", False),
+          ("Vos droits", f"Vous pouvez exercer vos droits d'accès, de rectification, d'effacement, d'opposition, de limitation et de portabilité en écrivant à <a href=\"mailto:{EMAIL}\">{EMAIL}</a>. Si vous estimez que votre demande n'a pas été correctement traitée, vous pouvez saisir l'agence espagnole de protection des données (<a href=\"https://www.aepd.es\" rel=\"noopener\">www.aepd.es</a>).", False)],
+ "cookies": [("Ce site n'utilise aucun cookie","Nous n'utilisons aucun cookie propre ni tiers à des fins d'analyse, de publicité ou de suivi. Vous pouvez parcourir tout le site sans qu'aucun cookie ne soit installé.", False),
+             ("Contenu externe","La carte Google et les vidéos ne se chargent pas à l'ouverture de la page : elles ne se chargent que si vous cliquez dessus. À ce moment-là —et seulement alors— le fournisseur concerné (Google, YouTube ou Facebook) peut installer ses propres cookies, soumis à ses politiques. Si vous ne cliquez pas, rien n'est installé.", False)],
+},
+}
+LEG_KEY = {"aviso-legal":"aviso","privacidad":"priv","cookies":"cookies"}
+
+def page_legal(lang, which):
+    g = LEG[lang]
+    title, desc = g["meta"][which]
+    h1 = title.split(" | ")[0]
+    blocks = []
+    for item in g[LEG_KEY[which]]:
+        head, text, with_id = item
+        idblock = _identity(g["id_labels"]) if with_id else ""
+        blocks.append(f"<h2>{head}</h2><p>{text}</p>{idblock}")
+    body = f"""
+<section class="page-head"><h1>{h1}</h1></section>
+<section class="legal-wrap">{''.join(blocks)}</section>"""
+    return layout(lang, which, title, desc, body)
+
+
 BUILDERS = {"home":page_home,"carta":page_carta,"senyoret":page_senyoret,"historia":page_historia,
             "galeria":page_galeria,"reservas":page_reservas,"visitenos":page_visitenos,"lonja":page_lonja}
+for _k in ("aviso-legal","privacidad","cookies"):
+    BUILDERS[_k] = (lambda kk: lambda lang: page_legal(lang, kk))(_k)
 
 
 def main():
@@ -869,7 +983,27 @@ def main():
         f"<url><loc>{DOMAIN}{PATHS[p][l]}</loc></url>" for p in PATHS for l in LANGS)
     with open(os.path.join(DIST, "sitemap.xml"), "w", encoding="utf-8") as fh:
         fh.write(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>')
+    # Redirecciones 301 del WordPress viejo (91 URLs indexadas) → sitio nuevo. Apache/Hostinger.
+    with open(os.path.join(DIST, ".htaccess"), "w", encoding="utf-8") as fh:
+        fh.write(HTACCESS)
     print(f"OK: {n} páginas generadas en {DIST}")
+
+
+HTACCESS = """# Redirecciones 301 baydal.es: WordPress viejo → sitio estático. Generado por build.py.
+RewriteEngine On
+RewriteRule ^nuestra-historia/?$              /historia/     [R=301,L]
+RewriteRule ^aviso-legal-imprint/?$           /aviso-legal/  [R=301,L]
+RewriteRule ^declaracion-de-privacidad-ue/?$  /privacidad/   [R=301,L]
+RewriteRule ^politica-de-cookies-ue/?$        /cookies/      [R=301,L]
+RewriteRule ^terminos-y-condiciones/?$        /aviso-legal/  [R=301,L]
+RewriteRule ^descargo-de-responsabilidad/?$   /aviso-legal/  [R=301,L]
+RewriteRule ^accesibilidad/?$                 /aviso-legal/  [R=301,L]
+RewriteRule ^menu-item/                       /carta/        [R=301,L]
+RewriteRule ^menu-section/                    /carta/        [R=301,L]
+RewriteRule ^fdm-menu-section/                /carta/        [R=301,L]
+RewriteRule ^menu/                            /carta/        [R=301,L]
+RewriteRule ^carta/[^/]+/?$                   /carta/        [R=301,L]
+"""
 
 
 if __name__ == "__main__":

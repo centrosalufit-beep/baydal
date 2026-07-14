@@ -253,3 +253,15 @@ main .cta.ghost:hover{color:var(--oro-osc);border-color:var(--oro)}
   .res form{padding:28px 22px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card img,.gal img{transition:none}}
+
+/* ---------- páginas legales + facade del mapa ---------- */
+.legal-wrap{max-width:760px;margin:0 auto;padding:10px 24px 70px}
+.legal-wrap h2{font-size:26px;margin:1.6em 0 .3em;color:var(--marino-2)}
+.legal-wrap p{margin:.4em 0;color:var(--tinta)}
+.legal-wrap a{color:var(--oro-osc)}
+.legal-id{list-style:none;padding:16px 20px;margin:1em 0;background:var(--crema-2);border-left:3px solid var(--oro);border-radius:4px}
+.legal-id li{margin:.35em 0}
+.map-facade{width:100%;min-height:320px;border:1px dashed var(--oro);background:var(--crema-2);
+  color:var(--oro-osc);font-family:var(--sans);font-size:16px;letter-spacing:.04em;cursor:pointer;border-radius:8px}
+.map-facade:hover{background:var(--crema);color:var(--marino-2)}
+.visit-map iframe{width:100%;min-height:320px;border:0;border-radius:8px}

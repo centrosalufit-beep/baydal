@@ -8,6 +8,18 @@ if (matchMedia("(prefers-reduced-motion: no-preference)").matches && "Intersecti
   });
 }
 
+// Mapa: carga el iframe de Google solo al pulsar (cero cookies hasta que el usuario lo pide)
+document.addEventListener("click", function (e) {
+  var b = e.target.closest(".map-facade");
+  if (!b) return;
+  var f = document.createElement("iframe");
+  f.src = b.dataset.map;
+  f.title = "Google Maps – Restaurante Baydal";
+  f.loading = "lazy";
+  f.allowFullscreen = true;
+  b.replaceWith(f);
+});
+
 // Reserva por WhatsApp: construye el wa.me con el mensaje en el idioma de la página
 document.addEventListener("submit", function (e) {
   var f = e.target;
