@@ -737,6 +737,7 @@ def page_senyoret(lang):
     faqs = "".join(f'<details><summary>{q}</summary><p>{a}</p></details>' for q, a in t["seny_faq"])
     fuentes = "".join(f'<blockquote>{q}<cite><a href="{url}" rel="noopener">{src}</a></cite></blockquote>' for src, q, url in PRESS[:3])
     fuentes += '<blockquote>«Fou inventat […] del restaurant Baydal de Calp.»<cite><a href="https://ca.wikipedia.org/wiki/Arr%C3%B2s_del_senyoret" rel="noopener">Viquipèdia — Arròs del senyoret</a></cite></blockquote>'
+    fuentes += '<blockquote>«Corría la década de los ochenta… le apodaban en la casa «el senyoret», desde el cariño, sin ánimo despectivo. Al principio no incluyeron la preparación en carta, pues daba un trabajo enorme, revela José Baydal, tercera generación al frente del negocio.»<cite>Igor Cubillo · LQCDM</cite></blockquote>'
     body = f"""
 <section class="page-head"><h1>{t['seny_h1']}</h1></section>
 <section class="story">
