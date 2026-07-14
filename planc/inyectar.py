@@ -37,9 +37,19 @@ print(f"{len(ficheros)} opciones, {len(pendientes)} pendientes")
 for i, f in enumerate(pendientes, 1):
     clave = os.path.basename(f)[:-5]
     valor = json.load(open(f, encoding="utf-8"))
-    llamar("tools/call", {"name": "wp_update_option", "arguments": {"key": clave, "value": valor}})
+    try:
+        llamar("tools/call", {"name": "wp_update_option", "arguments": {"key": clave, "value": valor}})
+        nota = ""
+    except RuntimeError as e:
+        # update_option devuelve false si el valor no cambia: verificar y seguir
+        actual = llamar("tools/call", {"name": "wp_get_option", "arguments": {"key": clave}})
+        texto = actual["content"][0]["text"]
+        leido = json.loads(texto)
+        if leido != valor:
+            raise SystemExit(f"{clave}: fallo real de update y el valor NO coincide: {e}")
+        nota = " (sin cambios)"
     with open(ESTADO, "a") as st:
         st.write(clave + "\n")
-    print(f"[{i}/{len(pendientes)}] {clave} ({os.path.getsize(f)//1024} KB)")
+    print(f"[{i}/{len(pendientes)}] {clave} ({os.path.getsize(f)//1024} KB){nota}")
 
 print("Inyección completa. El interruptor baydal_neo_activo NO se ha tocado.")

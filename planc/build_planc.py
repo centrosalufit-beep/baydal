@@ -30,25 +30,46 @@ def main():
 
     opciones = {}
 
-    # Páginas y assets desde dist/
-    assets_idx, n_asset = {}, 0
+    # 1ª pasada: numerar assets y construir el mapa de reescritura.
+    # nginx de Hostinger corta las rutas con extensión antes de llegar a PHP,
+    # así que los assets se sirven en rutas SIN extensión: /a/<n>
+    assets, assets_idx, mapa = [], {}, {}
+    n_asset = 0
     for base, _dirs, files in os.walk(DIST):
-        for f in files:
+        for f in sorted(files):
             full = os.path.join(base, f)
             rel = os.path.relpath(full, DIST).replace("\\", "/")
-            if f == ".htaccess":
+            if f == ".htaccess" or f.endswith(".html"):
                 continue
-            if f.endswith(".html"):
-                path = rel[:-len("index.html")].strip("/") if rel.endswith("index.html") else rel
-                slug = "home" if path == "" else path.replace("/", "_").replace(".", "_")
-                opciones[f"baydal_neo_pag_{slug}"] = open(full, encoding="utf-8").read()
-            else:
-                n_asset += 1
-                mime = MIMES.get(os.path.splitext(f)[1].lower()) or mimetypes.guess_type(f)[0] or "application/octet-stream"
-                opciones[f"baydal_neo_asset_{n_asset}"] = {
-                    "t": mime, "b": base64.b64encode(open(full, "rb").read()).decode()}
-                assets_idx["/" + rel] = n_asset
+            n_asset += 1
+            mime = MIMES.get(os.path.splitext(f)[1].lower()) or mimetypes.guess_type(f)[0] or "application/octet-stream"
+            assets.append((n_asset, full, mime))
+            assets_idx[f"/a/{n_asset}"] = n_asset
+            mapa["/" + rel] = f"/a/{n_asset}"
+
+    def reescribir(texto):
+        for viejo, nuevo in mapa.items():
+            texto = texto.replace(viejo, nuevo)
+        return texto
+
+    # 2ª pasada: assets (reescribiendo dentro del CSS las rutas de fuentes)
+    for n, full, mime in assets:
+        crudo = open(full, "rb").read()
+        if mime.startswith("text/") or "javascript" in mime or "xml" in mime:
+            crudo = reescribir(crudo.decode("utf-8")).encode("utf-8")
+        opciones[f"baydal_neo_asset_{n}"] = {"t": mime, "b": base64.b64encode(crudo).decode()}
     opciones["baydal_neo_assets_idx"] = assets_idx
+
+    # 3ª pasada: páginas con las referencias reescritas
+    for base, _dirs, files in os.walk(DIST):
+        for f in files:
+            if not f.endswith(".html"):
+                continue
+            full = os.path.join(base, f)
+            rel = os.path.relpath(full, DIST).replace("\\", "/")
+            path = rel[:-len("index.html")].strip("/") if rel.endswith("index.html") else rel
+            slug = "home" if path == "" else path.replace("/", "_").replace(".", "_")
+            opciones[f"baydal_neo_pag_{slug}"] = reescribir(open(full, encoding="utf-8").read())
 
     # Mapa 301 desde el .htaccess generado
     reglas = []
