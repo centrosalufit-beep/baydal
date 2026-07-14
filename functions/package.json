@@ -1,0 +1,19 @@
+{
+  "name": "baydal-reservas-functions",
+  "private": true,
+  "engines": { "node": "20" },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && node --test lib/*.test.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.56.0",
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "@types/node": "^20.14.0"
+  }
+}

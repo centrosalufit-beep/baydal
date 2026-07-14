@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Baydal · Reservas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Pantalla de acceso -->
+  <div id="pantalla-login" hidden>
+    <form id="form-login" class="tarjeta-login">
+      <h1>Baydal · Reservas</h1>
+      <label>Correo electrónico
+        <input type="email" id="login-email" autocomplete="username" required>
+      </label>
+      <label>Contraseña
+        <input type="password" id="login-clave" autocomplete="current-password" required>
+      </label>
+      <button type="submit" class="primario">Entrar</button>
+      <p id="login-error" class="error" hidden></p>
+    </form>
+  </div>
+
+  <!-- Aplicación -->
+  <div id="aplicacion" hidden>
+    <header>
+      <h1>Baydal · Reservas</h1>
+      <span id="estado-bot" class="estado-bot"><span class="punto"></span><span class="texto">…</span></span>
+      <button id="btn-salir" type="button">Salir</button>
+    </header>
+    <nav id="pestanas">
+      <button type="button" data-vista="agenda" class="activa">Agenda</button>
+      <button type="button" data-vista="mesas">Mesas</button>
+      <button type="button" data-vista="horarios">Horarios</button>
+      <button type="button" data-vista="festivos">Festivos</button>
+      <button type="button" data-vista="carta">Carta</button>
+      <button type="button" data-vista="estadisticas">Estadísticas</button>
+      <button type="button" data-vista="ajustes">Ajustes</button>
+    </nav>
+    <main id="vista"></main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

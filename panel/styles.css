@@ -1,0 +1,220 @@
+/* styles.css — panel Baydal · Reservas. Móvil primero, sin frameworks. */
+
+:root {
+  --acento: #0b6e4f;        /* verde Baydal */
+  --acento-oscuro: #095c42;
+  --rojo: #c62828;
+  --ambar: #b26a00;
+  --fondo: #f4f4f2;
+  --tarjeta: #ffffff;
+  --borde: #d9d9d4;
+  --texto: #1d1d1b;
+  --texto-suave: #6b6b66;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  font-size: 16px;
+}
+
+h1 { font-size: 1.15rem; margin: 0; }
+h2 { font-size: 1.05rem; margin: 0 0 .75rem; }
+h3 { margin: 0 0 .75rem; }
+
+/* ---------- Controles: grandes, para dedos en el móvil del restaurante ---------- */
+
+button, input, select, textarea {
+  font: inherit;
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+  padding: .4rem .7rem;
+  background: #fff;
+  color: inherit;
+}
+textarea { resize: vertical; }
+button { cursor: pointer; }
+button:active { transform: scale(.98); }
+button.primario { background: var(--acento); border-color: var(--acento); color: #fff; font-weight: 600; }
+button.primario:hover { background: var(--acento-oscuro); }
+button.peligro { color: var(--rojo); border-color: var(--rojo); }
+button.aviso { color: var(--ambar); border-color: var(--ambar); }
+
+label { display: flex; flex-direction: column; gap: .25rem; font-size: .9rem; }
+label small { color: var(--texto-suave); }
+.etiqueta-check { flex-direction: row; align-items: center; gap: .4rem; min-height: 44px; }
+.etiqueta-check input { min-height: 0; width: 22px; height: 22px; }
+
+.error { color: var(--rojo); font-weight: 600; }
+.suave { color: var(--texto-suave); }
+.notas { margin: .25rem 0 0; color: var(--texto-suave); font-style: italic; }
+
+a { color: var(--acento); }
+
+/* ---------- Login ---------- */
+
+#pantalla-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.tarjeta-login {
+  background: var(--tarjeta); border-radius: 14px; padding: 2rem;
+  width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 1rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+}
+.tarjeta-login h1 { text-align: center; color: var(--acento); }
+
+/* ---------- Cabecera y pestañas ---------- */
+
+header {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: .75rem;
+  background: var(--tarjeta); padding: .6rem 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+header h1 { color: var(--acento); flex: 1; }
+#btn-salir { min-height: 38px; }
+
+.estado-bot { display: flex; align-items: center; gap: .35rem; font-size: .85rem; font-weight: 600; }
+.estado-bot .punto { width: 12px; height: 12px; border-radius: 50%; background: #999; }
+.estado-bot.verde .punto { background: #1db954; }
+.estado-bot.verde .texto { color: #157a3c; }
+.estado-bot.rojo .punto { background: var(--rojo); }
+.estado-bot.rojo .texto { color: var(--rojo); }
+
+#pestanas {
+  display: flex; overflow-x: auto; background: var(--tarjeta);
+  border-bottom: 1px solid var(--borde);
+  position: sticky; top: 56px; z-index: 9;
+}
+#pestanas button {
+  flex: 1; min-width: max-content; border: none; border-radius: 0; background: none;
+  padding: .8rem 1rem; border-bottom: 3px solid transparent; font-weight: 600; color: var(--texto-suave);
+}
+#pestanas button.activa { color: var(--acento); border-bottom-color: var(--acento); }
+
+main { max-width: 960px; margin: 0 auto; padding: 1rem; }
+
+/* ---------- Bloques comunes ---------- */
+
+.tarjeta { background: var(--tarjeta); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+
+.fila-cabecera { display: flex; gap: .75rem; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; }
+.fila-botones { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-top: .75rem; }
+
+.rejilla-form { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; align-items: end; }
+.rejilla-form .ancho-total { grid-column: 1 / -1; }
+@media (max-width: 560px) { .rejilla-form { grid-template-columns: 1fr; } }
+
+/* ---------- Agenda ---------- */
+
+.turno { margin-bottom: 1.5rem; }
+.turno h2 { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--acento); padding-bottom: .3rem; }
+.contador { font-size: .85rem; color: var(--texto-suave); font-weight: 600; }
+
+.reserva {
+  display: flex; gap: .75rem; align-items: flex-start; flex-wrap: wrap;
+  background: var(--tarjeta); border-radius: 12px; padding: .75rem 1rem; margin-bottom: .6rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.reserva-hora { font-size: 1.3rem; font-weight: 700; color: var(--acento); min-width: 62px; display: flex; flex-direction: column; }
+.reserva-hora small { font-size: .7rem; font-weight: 600; color: var(--texto-suave); }
+.reserva-datos { flex: 1; min-width: 180px; }
+.reserva-acciones { display: flex; gap: .5rem; flex-wrap: wrap; width: 100%; }
+@media (min-width: 720px) { .reserva-acciones { width: auto; } }
+
+.badge-ok {
+  display: inline-block; margin-left: .4rem; padding: .1rem .5rem; border-radius: 999px;
+  font-size: .75rem; font-weight: 700; color: #157a3c; background: #e3f4e8;
+}
+
+/* Pendientes de decidir: bloque destacado ámbar, siempre lo primero */
+.pendientes h2 { border-bottom: 2px solid var(--ambar); padding-bottom: .3rem; color: var(--ambar); }
+.pendientes { margin-bottom: 1.5rem; }
+.reserva.pendiente { border-left: 6px solid var(--ambar); background: #fff8ec; }
+.reserva.pendiente .motivo { font-weight: 700; color: var(--ambar); }
+.elegir-mesas { display: flex; gap: .25rem 1rem; flex-wrap: wrap; margin-top: .4rem; }
+.elegir-mesas .etiqueta-check { min-height: 36px; }
+
+/* ---------- Mesas y zonas ---------- */
+
+.fila-edicion {
+  display: flex; gap: .6rem; align-items: end; flex-wrap: wrap;
+  padding: .6rem 0; border-bottom: 1px solid var(--borde);
+}
+.fila-edicion:last-child { border-bottom: none; }
+.fila-edicion input[type="number"] { width: 5.5rem; }
+.fila-edicion.nueva { background: #f7faf8; border-radius: 8px; padding: .6rem; margin-top: .75rem; }
+
+/* ---------- Horarios ---------- */
+
+fieldset.dia { border: 1px solid var(--borde); border-radius: 10px; margin: 0 0 .75rem; padding: .5rem .75rem .75rem; }
+fieldset.dia legend { font-weight: 700; padding: 0 .35rem; }
+.fila-turno { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; padding: .3rem 0; }
+.etiqueta-turno { font-weight: 600; min-width: 60px; }
+.fila-turno input[type="time"]:disabled { opacity: .35; }
+
+/* ---------- Festivos ---------- */
+
+.fila-festivo {
+  display: flex; justify-content: space-between; align-items: center; gap: .75rem;
+  padding: .6rem 0; border-bottom: 1px solid var(--borde); flex-wrap: wrap;
+}
+.fila-festivo:last-child { border-bottom: none; }
+.fila-festivo strong { text-transform: capitalize; }
+
+/* ---------- Carta ---------- */
+
+details.seccion summary {
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: .75rem;
+  font-size: 1.05rem; min-height: 44px; list-style-position: inside;
+}
+.seccion-cab { display: flex; gap: .75rem; align-items: end; flex-wrap: wrap; margin: .75rem 0; padding-bottom: .75rem; border-bottom: 1px solid var(--borde); }
+.seccion-cab input[type="number"] { width: 5rem; }
+
+.item { border: 1px solid var(--borde); border-radius: 10px; padding: .75rem; margin-bottom: .75rem; }
+.item-detalles { display: flex; gap: .75rem; align-items: end; flex-wrap: wrap; margin-top: .5rem; }
+.item-detalles input[type="number"] { width: 6.5rem; }
+
+.campo-idiomas { margin-bottom: .5rem; }
+.campo-idiomas .nombre-campo { font-size: .8rem; color: var(--texto-suave); text-transform: capitalize; }
+.campo-idiomas input { width: 100%; }
+.tabs-idioma { display: inline-flex; gap: 2px; margin: 0 0 .25rem .5rem; }
+.tabs-idioma button {
+  min-height: 30px; padding: .1rem .6rem; font-size: .8rem; text-transform: uppercase;
+  border-radius: 6px; color: var(--texto-suave);
+}
+.tabs-idioma button.activa { background: var(--acento); border-color: var(--acento); color: #fff; }
+.tabs-idioma button.vacia:not(.activa) { border-style: dashed; } /* pista: idioma sin traducir */
+
+/* ---------- Estadísticas: cifras y barras CSS ---------- */
+
+.cifras { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.cifra { display: flex; flex-direction: column; }
+.cifra strong { font-size: 1.6rem; color: var(--acento); }
+.cifra span { font-size: .85rem; color: var(--texto-suave); }
+
+.tabla-stats { width: 100%; border-collapse: collapse; }
+.tabla-stats th { text-align: left; font-size: .8rem; color: var(--texto-suave); padding: .2rem .5rem .2rem 0; }
+.tabla-stats td { padding: .25rem .5rem .25rem 0; border-bottom: 1px solid var(--fondo); }
+.tabla-stats .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tabla-stats .celda-barra { width: 50%; }
+.barra { height: 14px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--acento); }
+
+/* ---------- Ajustes: interruptor grande del bot ---------- */
+
+.interruptor-bot { flex-direction: row; align-items: center; gap: 1rem; cursor: pointer; }
+.interruptor-bot input { position: absolute; opacity: 0; }
+.interruptor-bot .deslizador {
+  width: 76px; height: 42px; border-radius: 21px; background: var(--rojo);
+  position: relative; transition: background .2s; flex-shrink: 0;
+}
+.interruptor-bot .deslizador::after {
+  content: ""; position: absolute; top: 4px; left: 4px; width: 34px; height: 34px;
+  border-radius: 50%; background: #fff; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.interruptor-bot input:checked + .deslizador { background: #1db954; }
+.interruptor-bot input:checked + .deslizador::after { left: 38px; }
+.texto-interruptor { font-size: 1.2rem; font-weight: 700; }
