@@ -164,7 +164,7 @@ reintenta la asignación; además revalida horario/festivo. Si ya no cabe → of
 
 ## Máquina de estados del bot (functions/src/flujo.ts)
 
-Webhook POST → firma HMAC → idempotencia `messageId` → 200 YA → procesar en background.
+Webhook POST → firma HMAC → idempotencia `messageId` → procesar → 200 al terminar (tras responder, Cloud Run corta la CPU: nada de "background"; los reintentos de Meta los absorbe `procesados/`).
 
 - `botActivo:false` → cortesía con teléfono y fin.
 - Listas máx 10 filas, botones máx 3. Payloads: `fecha_YYYY-MM-DD`, `fecha_otra`, `turno_comida|cena`,

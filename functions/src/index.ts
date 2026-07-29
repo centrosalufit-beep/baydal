@@ -60,16 +60,17 @@ export const whatsappWebhook = onRequest(
       return;
     }
 
-    // 200 inmediato para Meta; el handler sigue procesando hasta resolver
-    res.sendStatus(200);
-
+    // El 200 va al FINAL: tras responder, Cloud Run corta la CPU y el procesado
+    // "en segundo plano" se congela (aprendido el 29/07: respuestas de Paco que
+    // llegaban minutos tarde). Si Meta reintenta por tardar, procesados/ lo absorbe.
     inicializarWhatsApp(WHATSAPP_PHONE_ID.value(), WHATSAPP_TOKEN.value());
     try {
       await procesarEntrada(req.body);
     } catch (error) {
-      // Nunca dejamos escapar errores: Meta ya recibió su 200
+      // Nunca dejamos escapar errores: a Meta siempre le llega su 200
       console.error('[webhook] Error procesando la entrada:', error);
     }
+    res.sendStatus(200);
   }
 );
 
