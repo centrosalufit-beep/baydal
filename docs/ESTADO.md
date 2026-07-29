@@ -43,8 +43,9 @@ el plugin de WordPress (`wordpress/paco-chatbot/`) está listo para instalar.
 - Instalar el plugin en el WordPress de baydal.es y probar la edición
   ([`INTEGRACION_WP.md`](INTEGRACION_WP.md); el zip está en el Escritorio).
 - Ejecutar `scripts/plantillas.mjs` (ver cabecera) y vigilar la aprobación.
-- Zadarma: KYC en curso → cuando esté, paso 4 de [`ALTA_META.md`](ALTA_META.md)
-  (alta del número, `WHATSAPP_PHONE_ID` definitivo, método de pago, perfil).
+- Zadarma: KYC en curso → cuando llegue el número, seguir
+  [`NUMERO_ZADARMA.md`](NUMERO_ZADARMA.md) (alta en Meta, secret, deploy,
+  dónde poner el número en plugin/web/desvío).
 - Poner horarios y mesas REALES (los del seed son de ejemplo) desde el plugin
   o el panel. La carta YA es la real: mayo 2026, 51 platos, 5 idiomas,
   verificada céntimo a céntimo contra el PDF (`scripts/carta-mayo-2026.mjs`).
