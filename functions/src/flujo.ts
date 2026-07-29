@@ -684,7 +684,11 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
   const nombresMesas = mesaIds.map((id) => mesas.find((m) => m.id === id)?.nombre ?? id).join('+');
   await avisarSala(
     ctx,
-    `${reincidente ? '🟡 Pendiente (reincidente)' : '✅ Nueva'}: ${formatearFecha(fecha, 'es')} ${turno} ${hora} · ${comensales} pax · ${nombre} · ${nombresMesas}`
+    fichaReserva(
+      reincidente ? '🟡 RESERVA PENDIENTE (reincidente)' : '✅ NUEVA RESERVA',
+      { fecha, hora, comensales, nombre },
+      [`MESA: ${nombresMesas}`]
+    )
   );
 }
 
@@ -720,7 +724,11 @@ async function crearReservaGrupo(ctx: Ctx, borrador: Borrador): Promise<void> {
   await enviarTexto(ctx.telefono, t(ctx.idioma, 'grupoRecibido'));
   await avisarSala(
     ctx,
-    `🟡 GRUPO pendiente: ${formatearFecha(fecha!, 'es')} ${turno} ${hora} · ${comensales} pax · ${nombre} · +${ctx.telefono} (decidir en el panel)`
+    fichaReserva(
+      '🟡 GRUPO PENDIENTE',
+      { fecha: fecha!, hora: hora!, comensales: comensales!, nombre: nombre! },
+      [`TELÉFONO: +${ctx.telefono}`, 'Decidir en el panel']
+    )
   );
 }
 
@@ -806,7 +814,12 @@ async function cancelarReserva(ctx: Ctx, reservaId: string): Promise<void> {
   );
   await avisarSala(
     ctx,
-    `❌ Cancelada: ${formatearFecha(reserva.fecha, 'es')} ${reserva.turno} ${reserva.hora} · ${reserva.comensales} pax · ${reserva.nombre}`
+    fichaReserva('❌ CANCELADA', {
+      fecha: reserva.fecha,
+      hora: reserva.hora,
+      comensales: reserva.comensales,
+      nombre: reserva.nombre,
+    })
   );
   await enviarMenu(ctx); // por si quiere volver a reservar (modificar = cancelar + reservar)
 }
@@ -851,6 +864,20 @@ function resumenEscalado(ctx: Ctx, conv: Conversacion, motivo: string): string {
 /** Aviso operativo inmediato al WhatsApp de recepción (siempre, a cualquier hora) */
 async function avisarSala(ctx: Ctx, texto: string): Promise<void> {
   await enviarTexto(ctx.config.whatsappHumano, texto);
+}
+
+/** Ficha multilínea para los avisos a sala: título + FECHA/HORA/PERSONAS/NOMBRE (+extras) */
+function fichaReserva(
+  titulo: string,
+  r: { fecha: string; hora: string; comensales: number; nombre: string },
+  extras: string[] = []
+): string {
+  const fechaLarga = new Intl.DateTimeFormat('es-ES', {
+    timeZone: 'UTC', // fecha de calendario; a mediodía UTC no hay ambigüedad
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date(`${r.fecha}T12:00:00Z`));
+  return [titulo, `FECHA: ${fechaLarga}`, `HORA: ${r.hora}`, `PERSONAS: ${r.comensales}`, `NOMBRE: ${r.nombre}`, ...extras].join('\n');
 }
 
 /** true si la hora actual de Madrid cae dentro de config.atencionHumana */
