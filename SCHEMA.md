@@ -12,7 +12,7 @@ Este documento es el **contrato único** entre módulos. Cualquier cambio de mod
 - **WhatsApp Business Platform (Cloud API) v23.0**, número NUEVO dedicado al bot (pendiente de alta; desarrollo con número de pruebas de Meta).
 - **Claude Haiku** (`claude-haiku-4-5-20251001`) SOLO para: interpretar texto libre → intención+datos, y responder preguntas de carta/horarios/info práctica. El flujo de reserva es una máquina de estados determinista con botones.
 - **Whisper (OpenAI, `whisper-1`)** para transcribir notas de voz → el texto entra al flujo normal.
-- **Secrets** (Google Secret Manager): `WHATSAPP_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_PHONE_ID`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`.
+- **Secrets** (Google Secret Manager): `WHATSAPP_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_PHONE_ID`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `WP_API_TOKEN` (API del plugin de WordPress).
 
 ## Convenciones
 
@@ -207,6 +207,7 @@ plantilla `pedir_resena`) y sella `resenaPedidaEn`. Nunca dos veces, nunca con `
 | Función | Tipo | Región | Qué hace |
 |---|---|---|---|
 | `whatsappWebhook` | HTTP | europe-southwest1 | GET verificación Meta, POST mensajes |
+| `wpApi` | HTTP | europe-southwest1 | API con token Bearer (secret `WP_API_TOKEN`) para el plugin de WordPress: GET/POST/PUT/DELETE `/carta`, GET/PUT `/horario` y `/info` — solo carta y esos dos campos de `config/restaurante`; reservas/clientes/conversaciones inalcanzables |
 | `onReservaActualizada` | trigger Firestore onDocumentUpdated `reservas/{id}` | europe-southwest1 | panel→noshow: incrementa `clientes.noshows`; pendiente→confirmada (origen bot/web): notifica al cliente; confirmada→cancelada desde panel con fecha futura (origen bot/web): notifica al cliente; `pedirResena` a true: envía petición de reseña |
 | `recordatorios` | scheduled 10:07 | europe-west1 | plantilla recordatorio + botones (ciclo arriba) |
 | `liberarNoConfirmadas` | scheduled cada 15 min | europe-west1 | aviso T-4h y liberación T-2h (ciclo arriba) |
@@ -231,6 +232,8 @@ Vistas (SPA, pestañas):
 7. **Ajustes**: botActivo (interruptor grande), nombreBot, maxComensalesBot, maxReservasActivas, slotMinutos, antelaciones, cortesiaMin, atencionHumana, teléfonos, enlaceResenas, ubicación (lat/lng/dirección), **infoPractica** (textarea grande).
 
 `panel/disponibilidad.js`: espejo JS del motor TS (ocupación por turno, tríos combinables). // ponytail: duplicado consciente; futura callable si duele.
+
+La **carta**, los **horarios** y la **infoPractica** también se editan desde el WordPress de baydal.es (plugin `wordpress/paco-chatbot/` → función `wpApi`, ver `docs/INTEGRACION_WP.md`): panel y WordPress escriben lo mismo y vale el último guardado.
 
 ## Textos del bot
 

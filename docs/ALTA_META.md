@@ -1,6 +1,6 @@
 # Alta en WhatsApp Business Platform (Meta) — paso a paso
 
-Objetivo: que Paco pueda **recibir y enviar** mensajes de WhatsApp con la Cloud API de Meta (v23.0, ver `SCHEMA.md`). Al final tendrás los 4 valores de WhatsApp que se cargan como secrets en el paso 7 del `README.md` (los secrets son **6 en total**: estos 4 + `ANTHROPIC_API_KEY` + `OPENAI_API_KEY`, que salen de sus consolas y no de Meta).
+Objetivo: que Paco pueda **recibir y enviar** mensajes de WhatsApp con la Cloud API de Meta (v23.0, ver `SCHEMA.md`). Al final tendrás los 4 valores de WhatsApp que se cargan como secrets en el paso 7 del `README.md` (los secrets son **7 en total**: estos 4 + `ANTHROPIC_API_KEY` + `OPENAI_API_KEY` + `WP_API_TOKEN`, que no salen de Meta).
 
 | Secret | Qué es | Dónde sale |
 |---|---|---|
@@ -10,6 +10,7 @@ Objetivo: que Paco pueda **recibir y enviar** mensajes de WhatsApp con la Cloud 
 | `WHATSAPP_PHONE_ID` | ID del número de teléfono | Paso 3 (pruebas) / Paso 4 (definitivo) |
 | `ANTHROPIC_API_KEY` | API key de Claude | <https://console.anthropic.com> → API Keys |
 | `OPENAI_API_KEY` | API key de OpenAI (Whisper, notas de voz) | <https://platform.openai.com> → API keys |
+| `WP_API_TOKEN` | Token del plugin de WordPress (frase que inventas tú) | README paso 7 y [`INTEGRACION_WP.md`](INTEGRACION_WP.md) |
 
 ## Paso 1 — Cuenta de Meta Business
 

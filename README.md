@@ -17,6 +17,7 @@ El contrato de datos (colecciones, campos, convenciones) está en [`SCHEMA.md`](
 | Reseñas Google | Botón ⭐ en el panel: Paco manda al cliente el enlace directo de reseña |
 | Resumen diario | A las 9:31, WhatsApp a recepción con el día y el buzón nocturno |
 | Reservas desde baydal.es | El formulario de la web abre el chat de Paco con los datos ya puestos ([`docs/INTEGRACION_WEB.md`](docs/INTEGRACION_WEB.md)) |
+| Plugin de WordPress | En baydal.es: formulario de reservas (shortcode), botón flotante y edición de carta, horarios e info práctica sin entrar al panel ([`docs/INTEGRACION_WP.md`](docs/INTEGRACION_WP.md)) |
 | Panel | Agenda con pendientes en ámbar, mesas, horarios, festivos, carta en 5 idiomas, estadísticas y exportar CSV |
 
 ## Arquitectura
@@ -51,10 +52,13 @@ baydal-reservas/
 ├── panel/                  ← panel web del personal (HTML+JS, sin build)
 ├── scripts/
 │   └── seed.mjs            ← carga de datos iniciales (config, zonas, mesas, carta)
+├── wordpress/
+│   └── paco-chatbot/       ← plugin para el WordPress de baydal.es (formulario + carta/horarios/info)
 └── docs/
     ├── ALTA_META.md        ← alta en WhatsApp Business Platform y plantillas paso a paso
     ├── OPERACION.md        ← chuleta diaria para el personal
-    └── INTEGRACION_WEB.md  ← conectar el formulario de baydal.es con Paco
+    ├── INTEGRACION_WEB.md  ← conectar el formulario de baydal.es con Paco
+    └── INTEGRACION_WP.md   ← instalar y usar el plugin de WordPress
 ```
 
 ## Puesta en marcha completa (paso a paso)
@@ -121,11 +125,12 @@ npm install
 cd ..
 ```
 
-### 7. Cargar los secrets (las 6 claves)
+### 7. Cargar los secrets (las 7 claves)
 
 Los secrets son las contraseñas que usan las funciones. Se cargan una a una; cada comando
 pide el valor por teclado (no queda en el historial). Los 4 de WhatsApp salen de la guía
-[`docs/ALTA_META.md`](docs/ALTA_META.md); los de Anthropic y OpenAI, del paso 0.
+[`docs/ALTA_META.md`](docs/ALTA_META.md); los de Anthropic y OpenAI, del paso 0; los dos
+últimos los inventas tú (ver notas).
 
 ```
 firebase functions:secrets:set WHATSAPP_TOKEN --project baydal-reservas
@@ -134,9 +139,12 @@ firebase functions:secrets:set WHATSAPP_VERIFY_TOKEN --project baydal-reservas
 firebase functions:secrets:set WHATSAPP_PHONE_ID --project baydal-reservas
 firebase functions:secrets:set ANTHROPIC_API_KEY --project baydal-reservas
 firebase functions:secrets:set OPENAI_API_KEY --project baydal-reservas
+firebase functions:secrets:set WP_API_TOKEN --project baydal-reservas
 ```
 
 > `WHATSAPP_VERIFY_TOKEN` lo inventas tú: una frase larga sin espacios (p. ej. generada en un gestor de contraseñas). Es la misma que se pega luego en Meta al configurar el webhook.
+>
+> `WP_API_TOKEN` también lo inventas tú (otra frase aleatoria larga, distinta): es el token con el que el plugin de WordPress edita carta/horarios/info, y se pega luego en los ajustes del plugin ([`docs/INTEGRACION_WP.md`](docs/INTEGRACION_WP.md)).
 >
 > Si tu ID de proyecto tiene sufijo, usa ese ID en `--project`.
 
@@ -212,3 +220,4 @@ Después del seed, revisa en el panel las mesas y horarios reales del restaurant
 - [`docs/ALTA_META.md`](docs/ALTA_META.md) — alta en WhatsApp Business Platform, webhook y las 4 plantillas en 5 idiomas.
 - [`docs/OPERACION.md`](docs/OPERACION.md) — chuleta de uso diario para el personal.
 - [`docs/INTEGRACION_WEB.md`](docs/INTEGRACION_WEB.md) — encargo para conectar el formulario de baydal.es con Paco.
+- [`docs/INTEGRACION_WP.md`](docs/INTEGRACION_WP.md) — instalar y usar el plugin de WordPress (formulario + carta/horarios/info).

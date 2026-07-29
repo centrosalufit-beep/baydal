@@ -1,5 +1,5 @@
 // index.ts — Cloud Functions Gen 2 del bot de reservas Baydal.
-// whatsappWebhook (HTTP) y onReservaActualizada (trigger) en europe-southwest1;
+// whatsappWebhook y wpApi (HTTP) y onReservaActualizada (trigger) en europe-southwest1;
 // recordatorios, liberarNoConfirmadas, resumenDiario y limpieza (scheduled) en
 // europe-west1 (Cloud Scheduler no soporta southwest).
 
@@ -14,6 +14,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { enviarPlantilla, enviarTexto, enviarUbicacion, inicializarWhatsApp } from './whatsapp';
 import { formatearFecha, procesarMensaje, type MensajeEntrante } from './flujo';
 import { transcribir } from './claude';
+import { manejarWpApi } from './wpapi';
 import { t } from './textos';
 import { ahoraMadrid, aHHMM, aMinutos, sumarDias } from './disponibilidad';
 import type { Config, Reserva } from './tipos';
@@ -28,6 +29,7 @@ const WHATSAPP_VERIFY_TOKEN = defineSecret('WHATSAPP_VERIFY_TOKEN');
 const WHATSAPP_PHONE_ID = defineSecret('WHATSAPP_PHONE_ID');
 const ANTHROPIC_API_KEY = defineSecret('ANTHROPIC_API_KEY');
 const OPENAI_API_KEY = defineSecret('OPENAI_API_KEY'); // Whisper (notas de voz)
+const WP_API_TOKEN = defineSecret('WP_API_TOKEN'); // API del plugin de WordPress
 
 // ── Webhook de WhatsApp ──────────────────────────────────────────────
 
@@ -168,6 +170,12 @@ function normalizarMensaje(msg: WebhookMensaje, contactos: WebhookContacto[]): M
   // Imagen, ubicación, stickers… (el audio lo convierte procesarEntrada)
   return { telefono, tipo: 'noSoportado', nombrePerfil };
 }
+
+// ── API para el plugin de WordPress (carta, horario, info) ───────────
+
+export const wpApi = onRequest({ secrets: [WP_API_TOKEN] }, async (req, res) => {
+  await manejarWpApi(req, res, WP_API_TOKEN.value());
+});
 
 // ── Trigger: cambios en reservas (panel ↔ bot) ───────────────────────
 
