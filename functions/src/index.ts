@@ -173,7 +173,8 @@ function normalizarMensaje(msg: WebhookMensaje, contactos: WebhookContacto[]): M
 
 // ── API para el plugin de WordPress (carta, horario, info) ───────────
 
-export const wpApi = onRequest({ secrets: [WP_API_TOKEN] }, async (req, res) => {
+// invoker explícito: al crearla, Cloud Run no aplicó el acceso público por defecto
+export const wpApi = onRequest({ invoker: 'public', secrets: [WP_API_TOKEN] }, async (req, res) => {
   await manejarWpApi(req, res, WP_API_TOKEN.value());
 });
 
