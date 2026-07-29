@@ -126,21 +126,23 @@ Botones: los mismos dos y en el mismo orden que `recordatorio_reserva`.
 
 ### 7.3 `reserva_liberada` (ejemplos: `14:00`, `965 831 111`) — sin botones
 
-- **es**: `Hola, soy Paco, del Restaurante Baydal. Al no recibir confirmación, tu reserva de hoy a las {{1}} se ha cancelado y la mesa ha quedado libre. Si aún quieres venir, escríbeme o llama al {{2}}.`
-- **va** (código ca): `Hola, soc Paco, del Restaurante Baydal. Com que no hem rebut confirmació, la teua reserva de hui a les {{1}} s'ha cancel·lat i la taula ha quedat lliure. Si encara vols vindre, escriu-me o telefona al {{2}}.`
-- **en**: `Hello, this is Paco from Restaurante Baydal. As we didn't receive a confirmation, your reservation today at {{1}} has been cancelled and the table released. If you'd still like to come, message me or call {{2}}.`
+Ojo (regla de Meta aprendida el 29/07): **una variable no puede ser lo último del texto** — de ahí el "gracias" final (el alemán acaba en "an." y no lo necesita).
+
+- **es**: `Hola, soy Paco, del Restaurante Baydal. Al no recibir confirmación, tu reserva de hoy a las {{1}} se ha cancelado y la mesa ha quedado libre. Si aún quieres venir, escríbeme o llama al {{2}}. ¡Gracias!`
+- **va** (código ca): `Hola, soc Paco, del Restaurante Baydal. Com que no hem rebut confirmació, la teua reserva de hui a les {{1}} s'ha cancel·lat i la taula ha quedat lliure. Si encara vols vindre, escriu-me o telefona al {{2}}. Gràcies!`
+- **en**: `Hello, this is Paco from Restaurante Baydal. As we didn't receive a confirmation, your reservation today at {{1}} has been cancelled and the table released. If you'd still like to come, message me or call {{2}}. Thank you!`
 - **de**: `Hallo, hier ist Paco vom Restaurante Baydal. Da wir keine Bestätigung erhalten haben, wurde Ihre heutige Reservierung um {{1}} Uhr storniert und der Tisch freigegeben. Wenn Sie noch kommen möchten, schreiben Sie mir oder rufen Sie {{2}} an.`
-- **fr**: `Bonjour, c'est Paco du Restaurante Baydal. Faute de confirmation, votre réservation d'aujourd'hui à {{1}} a été annulée et la table libérée. Si vous souhaitez toujours venir, écrivez-moi ou appelez le {{2}}.`
+- **fr**: `Bonjour, c'est Paco du Restaurante Baydal. Faute de confirmation, votre réservation d'aujourd'hui à {{1}} a été annulée et la table libérée. Si vous souhaitez toujours venir, écrivez-moi ou appelez le {{2}}. Merci !`
 
 ### 7.4 `pedir_resena` (ejemplos: `María`, `https://g.page/r/XXXX/review`) — sin botones, categoría **Marketing**
 
 Solo se usa si la ventana de 24 h está cerrada (si está abierta, Paco manda mensaje libre, gratis).
 
-- **es**: `¡Gracias por tu visita, {{1}}! Soy Paco, del Restaurante Baydal 🥘 Si has quedado contento, ¿nos dejas una reseña en Google? Se hace en un minuto: {{2}}`
-- **va** (código ca): `Gràcies per la teua visita, {{1}}! Soc Paco, del Restaurante Baydal 🥘 Si has quedat content, ens deixes una ressenya en Google? Es fa en un minut: {{2}}`
-- **en**: `Thank you for your visit, {{1}}! This is Paco from Restaurante Baydal 🥘 If you enjoyed it, would you leave us a Google review? It only takes a minute: {{2}}`
-- **de**: `Vielen Dank für Ihren Besuch, {{1}}! Hier ist Paco vom Restaurante Baydal 🥘 Wenn es Ihnen gefallen hat, würden Sie uns eine Google-Bewertung hinterlassen? Es dauert nur eine Minute: {{2}}`
-- **fr**: `Merci de votre visite, {{1}} ! C'est Paco du Restaurante Baydal 🥘 Si vous avez passé un bon moment, nous laisseriez-vous un avis Google ? Cela ne prend qu'une minute : {{2}}`
+- **es**: `¡Gracias por tu visita, {{1}}! Soy Paco, del Restaurante Baydal 🥘 Si has quedado contento, ¿nos dejas una reseña en Google? Se hace en un minuto: {{2}} ¡Gracias!`
+- **va** (código ca): `Gràcies per la teua visita, {{1}}! Soc Paco, del Restaurante Baydal 🥘 Si has quedat content, ens deixes una ressenya en Google? Es fa en un minut: {{2}} Gràcies!`
+- **en**: `Thank you for your visit, {{1}}! This is Paco from Restaurante Baydal 🥘 If you enjoyed it, would you leave us a Google review? It only takes a minute: {{2}} Thank you!`
+- **de**: `Vielen Dank für Ihren Besuch, {{1}}! Hier ist Paco vom Restaurante Baydal 🥘 Wenn es Ihnen gefallen hat, würden Sie uns eine Google-Bewertung hinterlassen? Es dauert nur eine Minute: {{2}} Vielen Dank!`
+- **fr**: `Merci de votre visite, {{1}} ! C'est Paco du Restaurante Baydal 🥘 Si vous avez passé un bon moment, nous laisseriez-vous un avis Google ? Cela ne prend qu'une minute : {{2}} Merci !`
 
 ### Cómo se mapean los payloads de los botones (importante)
 
