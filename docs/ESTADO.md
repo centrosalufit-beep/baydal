@@ -4,10 +4,15 @@ _Última revisión: 29/07/2026 (tarde)_
 
 ## Resumen
 
-Rama `chatbot-wordpress`. **EL BOT FUNCIONA**: desplegado en `baydal-reservas`,
-webhook verificado, bot activo y **flujo de reserva completo probado con éxito**
-sobre el número de pruebas de Meta (+1 555 656 6087). La API `wpApi` responde y
-el plugin de WordPress (`wordpress/paco-chatbot/`) está listo para instalar.
+Rama `chatbot-wordpress`. El bot llegó a funcionar completo sobre el número de
+pruebas de Meta (+1 555 656 6087), pero desde el 29/07 por la tarde está
+**CAÍDO por dos frentes**: `WHATSAPP_TOKEN` caducado (expiró a las 15:00; no
+era el permanente) y **créditos de Anthropic agotados** (`interpretar falló`
+en los logs). Arreglo: Fase 0 de [`NUMERO_FIJO.md`](NUMERO_FIJO.md).
+
+**Decisión 29/07**: el número definitivo de Paco será el propio fijo del
+restaurante **965 831 111** (Opción C, coste 0 €). Guía completa:
+[`NUMERO_FIJO.md`](NUMERO_FIJO.md). Zadarma queda como plan B.
 
 ## Hecho el 29/07/2026
 
@@ -38,18 +43,22 @@ el plugin de WordPress (`wordpress/paco-chatbot/`) está listo para instalar.
 
 ## Pendiente
 
-- Redeploy del webhook para estrenar las fichas de aviso a sala
-  (`firebase deploy --only functions:whatsappWebhook`).
+- **URGENTE — Fase 0 de [`NUMERO_FIJO.md`](NUMERO_FIJO.md)**: recargar
+  créditos de Anthropic + generar y cargar el token permanente de system user
+  (`WHATSAPP_TOKEN`) + redeploy + comprobar plantillas APPROVED. Hecho el
+  29/07 según David: redeploy del webhook (fichas de sala) y ejecución de
+  `scripts/plantillas.mjs`; la aprobación de plantillas quedó sin verificar
+  por el token caducado.
+- **Número definitivo = fijo 965 831 111**: seguir Fases 1–5 de
+  [`NUMERO_FIJO.md`](NUMERO_FIJO.md) (comprobar que el fijo no tiene WhatsApp,
+  alta en Meta con verificación por llamada, secret `WHATSAPP_PHONE_ID`,
+  deploy, plugin/web, cancelar Zadarma).
 - Instalar el plugin en el WordPress de baydal.es y probar la edición
   ([`INTEGRACION_WP.md`](INTEGRACION_WP.md); el zip está en el Escritorio).
-- Ejecutar `scripts/plantillas.mjs` (ver cabecera) y vigilar la aprobación.
-- Zadarma: KYC en curso → cuando llegue el número, seguir
-  [`NUMERO_ZADARMA.md`](NUMERO_ZADARMA.md) (alta en Meta, secret, deploy,
-  dónde poner el número en plugin/web/desvío).
 - Poner horarios y mesas REALES (los del seed son de ejemplo) desde el plugin
   o el panel. La carta YA es la real: mayo 2026, 51 platos, 5 idiomas,
   verificada céntimo a céntimo contra el PDF (`scripts/carta-mayo-2026.mjs`).
-- Conectar el formulario de baydal.es a Paco cuando exista el número definitivo
+- Conectar el formulario de baydal.es a Paco cuando el fijo esté dado de alta
   (rama `web`, [`INTEGRACION_WEB.md`](INTEGRACION_WEB.md)).
 - Conectar el dominio `panel.baydal.es` en Hostinger.
 - Subir el runtime de Node 20 → 22 antes del **30/10/2026** (aviso de Google
