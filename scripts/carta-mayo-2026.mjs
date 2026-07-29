@@ -27,7 +27,7 @@ const dual = (peq, norm) =>
 
 const SALSAS = t(
   'Se pueden servir con salsa de champiñones, de pimienta o roquefort',
-  'Es poden servir amb salsa de xampinyons, de pimenta o rocafort',
+  'Es poden servir amb salsa de xampinyons, de pebre o roquefort',
   'Can be served with mushroom, pepper or Roquefort sauce',
   'Auf Wunsch mit Champignon-, Pfeffer- oder Roquefortsauce',
   'Servies au choix avec sauce aux champignons, au poivre ou au roquefort'
@@ -101,7 +101,8 @@ const SECCIONES = [
       [t('Paella vegetariana', 'Paella vegetariana', 'Vegetarian paella', 'Vegetarische Paella', 'Paella végétarienne'), 13.95, null, true],
       [t('Paella de carne y verdura', 'Paella de carn i verdura', 'Meat & vegetable paella', 'Fleisch-Gemüse-Paella', 'Paella viande et légumes'), 17.5, null, true],
       [t('Paella mixta', 'Paella mixta', 'Mixed paella (meat & seafood)', 'Gemischte Paella (Fleisch & Meeresfrüchte)', 'Paella mixte (viande & fruits de mer)'), 19.0, null, true],
-      [t('Arroz de bacalao y coliflor', 'Arròs de bacallà i coliflor', 'Cod & cauliflower rice', 'Reis mit Kabeljau und Blumenkohl', 'Riz à la morue et au chou-fleur'), 17.5, null, true],
+      // El PDF de mayo la llama "paella" (build.py de la web decía "arroz"): el PDF manda
+      [t('Paella de bacalao y coliflor', 'Paella de bacallà i coliflor', 'Cod & cauliflower paella', 'Paella mit Kabeljau und Blumenkohl', 'Paella à la morue et au chou-fleur'), 17.5, null, true],
       [t('Paella de marisco', 'Paella de marisc', 'Seafood paella', 'Meeresfrüchte-Paella', 'Paella aux fruits de mer'), 19.0, null, true],
       [t('Arròs del senyoret', 'Arròs del senyoret', 'Arròs del senyoret — the original', 'Arròs del Senyoret — das Original', "Arròs del senyoret — l'original"), 18.5,
         t('El original: nació en esta casa', "L'original: va nàixer en esta casa", 'Seafood peeled & cleaned; born in this house', 'Fang komplett geschält; hier geboren', 'Fruits de mer décortiqués ; né dans cette maison'), true],
