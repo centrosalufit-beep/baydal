@@ -10,7 +10,7 @@ DIST = os.path.join(ROOT, "dist")
 DOMAIN = "https://baydal.es"
 TEL = "+34965831111"
 TEL_VISIBLE = "965 831 111"
-WA = "34677490049"
+WA = "34965831111"  # bot de reservas (Paco) — antes recepción 34677490049
 # Dirección oficial confirmada por David 13/07/2026 (Google/IG/Yelp dicen 12: corregirlos allí, no copiarlos)
 ADDRESS = "Avinguda del Port, 10"
 GEO = (38.6366, 0.0706)
