@@ -1,18 +1,33 @@
 # Estado — Paco (chatbot WhatsApp)
 
-_Última revisión: 29/07/2026 (tarde)_
+_Última revisión: 30/07/2026_
+
+## Hecho el 30/07/2026
+
+- **Fase 0 de NUMERO_FIJO.md COMPLETADA**: créditos Anthropic recargados (25 $),
+  token permanente de system user cargado y redesplegado, plantillas 19/20
+  APPROVED (falta `pedir_resena` de, en revisión). **EL BOT VUELVE A FUNCIONAR**
+  y el flujo completo se ha probado con éxito ("ha ido de maravilla").
+- Horario real de verano en Firestore: comida y cena TODOS los días
+  (`scripts/horario-agosto.mjs`); el seed traía cena solo vie/sáb y Paco
+  rechazaba cenas entre semana.
+- Pulido tras pruebas reales: notas se anotan tal cual (celíacos/trona
+  escalaba), idioma pegajoso (saltaba a valenciano), sin "terraza" en la
+  pregunta de notas, aviso de cortesía como mensaje aparte (la confirmación
+  decía "la mesa 15 min" y se leía "mesa nº 15").
+- infoPractica: añadidas opciones sin gluten para celíacos.
+- Pin de ubicación corregido: caía al mar; ahora 38.639563, 0.070688
+  (plus code J3QC+R7 de la ficha de Google).
 
 ## Resumen
 
-Rama `chatbot-wordpress`. El bot llegó a funcionar completo sobre el número de
-pruebas de Meta (+1 555 656 6087), pero desde el 29/07 por la tarde está
-**CAÍDO por dos frentes**: `WHATSAPP_TOKEN` caducado (expiró a las 15:00; no
-era el permanente) y **créditos de Anthropic agotados** (`interpretar falló`
-en los logs). Arreglo: Fase 0 de [`NUMERO_FIJO.md`](NUMERO_FIJO.md).
+Rama `chatbot-wordpress`. **EL BOT FUNCIONA** sobre el número de pruebas de
+Meta (+1 555 656 6087) con token permanente, horario real y flujo probado a
+fondo el 30/07 con datos reales.
 
 **Decisión 29/07**: el número definitivo de Paco será el propio fijo del
 restaurante **965 831 111** (Opción C, coste 0 €). Guía completa:
-[`NUMERO_FIJO.md`](NUMERO_FIJO.md). Zadarma queda como plan B.
+[`NUMERO_FIJO.md`](NUMERO_FIJO.md) (Fase 0 ya hecha). Zadarma queda como plan B.
 
 ## Hecho el 29/07/2026
 
@@ -43,12 +58,6 @@ restaurante **965 831 111** (Opción C, coste 0 €). Guía completa:
 
 ## Pendiente
 
-- **URGENTE — Fase 0 de [`NUMERO_FIJO.md`](NUMERO_FIJO.md)**: recargar
-  créditos de Anthropic + generar y cargar el token permanente de system user
-  (`WHATSAPP_TOKEN`) + redeploy + comprobar plantillas APPROVED. Hecho el
-  29/07 según David: redeploy del webhook (fichas de sala) y ejecución de
-  `scripts/plantillas.mjs`; la aprobación de plantillas quedó sin verificar
-  por el token caducado.
 - **Número definitivo = fijo 965 831 111**: seguir Fases 1–5 de
   [`NUMERO_FIJO.md`](NUMERO_FIJO.md) (comprobar que el fijo no tiene WhatsApp,
   alta en Meta con verificación por llamada, secret `WHATSAPP_PHONE_ID`,
