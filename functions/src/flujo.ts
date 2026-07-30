@@ -678,10 +678,11 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
         fecha: formatearFecha(fecha, ctx.idioma),
         hora,
         comensales,
-        cortesia: ctx.config.cortesiaMin,
         nombre: ctx.config.nombre,
       })
     );
+    // Aviso de cortesía (mensaje aparte): la mesa se guarda cortesiaMin minutos
+    await enviarTexto(ctx.telefono, t(ctx.idioma, 'cortesiaAviso', { cortesia: ctx.config.cortesiaMin }));
     // Pin de ubicación del restaurante
     const u = ctx.config.ubicacion;
     await enviarUbicacion(ctx.telefono, u.lat, u.lng, ctx.config.nombre, u.direccion);
