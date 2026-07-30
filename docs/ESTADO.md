@@ -53,6 +53,9 @@ restaurante **965 831 111** (Opción C, coste 0 €). Guía completa:
 - App Meta `chatbot_reservas` id `808415372203366` (cuenta de Jose,
   fjbaydal@yahoo.es) · WABA `2004127973561093` · Phone ID pruebas
   `1265376799990951`. Verificación del negocio: hecha.
+- **NÚMERO DEFINITIVO ACTIVO (30/07)**: el fijo **965 831 111**, Phone ID
+  `1149583188249281`, VERIFIED + CONNECTED en Cloud API, nombre verificado
+  "Restaurante Baydal". Secret `WHATSAPP_PHONE_ID` actualizado y desplegado.
 - Los 7 secrets cargados y funcionando. Copias locales de David (Escritorio):
   `paco-api-token.txt` (token del plugin) y `verify-token.txt` (webhook).
 
