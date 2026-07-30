@@ -313,6 +313,13 @@ async function manejarTexto(ctx: Ctx, conv: Conversacion, texto: string, esNueva
         return;
       }
       if (conv.paso !== 'IDLE' && conv.paso !== 'CANCELAR_ELEGIR') return siguientePaso(ctx, borrador);
+      // En IDLE un "hola" (u otro texto sin intención clara) NO escala: se
+      // saluda con el menú, como en el primer contacto. Sin esto, cualquier
+      // cliente que repitiera y saludara acababa en ESPERANDO_HUMANO.
+      if (conv.paso === 'IDLE') {
+        await guardarConv(ctx, 'IDLE', {});
+        return enviarSaludo(ctx);
+      }
       return escalar(ctx, conv, `No he entendido al cliente. Último mensaje: "${texto}"`);
     }
   }
