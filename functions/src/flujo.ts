@@ -698,13 +698,12 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
   }
 
   // Aviso operativo a sala: SIEMPRE, en cada reserva (fuera de la franja también)
-  const nombresMesas = mesaIds.map((id) => mesas.find((m) => m.id === id)?.nombre ?? id).join('+');
   await avisarSala(
     ctx,
     fichaReserva(
       reincidente ? '🟡 RESERVA PENDIENTE (reincidente)' : '✅ NUEVA RESERVA',
       { fecha, hora, comensales, nombre },
-      [`MESA: ${nombresMesas}`]
+      [`TELÉFONO: +${ctx.telefono}`]
     )
   );
 }
