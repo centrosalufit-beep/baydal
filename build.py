@@ -645,6 +645,7 @@ def page_home(lang):
     body = f"""
 <section class="hero-full">
   {img('arros-del-senyoret', t['hero_h1'], 1300, 1300, lazy=False, cls='hero-bg')}
+  <video class="hero-vid" autoplay muted loop playsinline aria-hidden="true"><source src="https://baydal.es/wp-content/uploads/2026/07/baydal-hero-calp-aereo.mp4" type="video/mp4"></video>
   <div class="hero-veil"></div>
   <div class="hero-inner">
     <p class="kick">{t['since']} · Calp</p>

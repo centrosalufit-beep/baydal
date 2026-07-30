@@ -1,5 +1,11 @@
 # Plan C — publicar la web nueva a través de WordPress (sin hPanel ni FTP)
 
+> ⚠️ **OJO (30/07/2026):** lo publicado en producción va POR DELANTE de este repo.
+> El payload vivo (build del 16/07) incluye el vídeo del hero y una sección de
+> reseñas (`.resenas`) en portada que NO están en `build.py`. Re-inyectar desde
+> este repo las borraría. Sincronizar `build.py` con producción antes de volver
+> a inyectar. El vídeo del hero ya está re-añadido (30/07); las reseñas no.
+
 La web nueva se guarda en la base de datos de WordPress y un mini-router PHP la
 sirve. El tema actual y Elementor no se tocan; /wp-admin sigue funcionando igual.
 Cuando haya acceso a hPanel se migra al despliegue Git (plan A) y este snippet
