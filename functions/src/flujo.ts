@@ -237,8 +237,15 @@ async function manejarTexto(ctx: Ctx, conv: Conversacion, texto: string, esNueva
   }
 
   const contexto = `paso=${conv.paso}; borrador=${JSON.stringify(borrador)}`;
-  const interp = await interpretar(texto, contexto);
+  const interp = await interpretar(texto, contexto, ctx.idioma);
   ctx.idioma = interp.idioma; // se persiste en el siguiente guardarConv
+
+  // En NOTAS, el texto ES la nota (celíacos, trona…): se anota tal cual, sin
+  // tratarlo como duda práctica (escalaría) ni extraerle datos ("1 trona" NO
+  // es comensales=1). Cancelar/humano/carta siguen funcionando a mitad de paso.
+  if (conv.paso === 'NOTAS' && ['reservar', 'otro', 'info'].includes(interp.intencion)) {
+    return siguientePaso(ctx, { ...borrador, notas: texto.trim() });
+  }
 
   // Saludo con RGPD en el primer contacto (o tras reinicio)
   if (esNuevaOReiniciada && interp.intencion === 'otro' && sinDatos(interp.datos)) {

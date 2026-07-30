@@ -168,11 +168,11 @@ export const TEXTOS = {
 
   // ── Paso NOTAS ───────────────────────────────────────────────────
   pideNotas: {
-    es: '¿Alguna nota para nosotros? (alergias, trona, terraza…)',
-    va: 'Alguna nota per a nosaltres? (al·lèrgies, trona, terrassa…)',
-    en: 'Any notes for us? (allergies, high chair, terrace…)',
-    de: 'Haben Sie Hinweise für uns? (Allergien, Hochstuhl, Terrasse …)',
-    fr: 'Une remarque pour nous ? (allergies, chaise haute, terrasse…)',
+    es: '¿Alguna nota para nosotros? (alergias, trona…)',
+    va: 'Alguna nota per a nosaltres? (al·lèrgies, trona…)',
+    en: 'Any notes for us? (allergies, high chair…)',
+    de: 'Haben Sie Hinweise für uns? (Allergien, Hochstuhl …)',
+    fr: 'Une remarque pour nous ? (allergies, chaise haute…)',
   },
   btnSinNotas: { es: 'Sin notas', va: 'Sense notes', en: 'No notes', de: 'Keine Hinweise', fr: 'Aucune remarque' },
 
@@ -187,12 +187,13 @@ export const TEXTOS = {
   sinNotas: { es: 'Sin notas', va: 'Sense notes', en: 'No notes', de: 'Keine Hinweise', fr: 'Aucune remarque' },
   btnConfSi: { es: 'Sí, confirmar', va: 'Sí, confirmar', en: 'Yes, confirm', de: 'Ja, bestätigen', fr: 'Oui, confirmer' },
   btnConfNo: { es: 'No, cancelar', va: 'No, cancel·lar', en: 'No, cancel', de: 'Nein, abbrechen', fr: 'Non, annuler' },
+  // Ojo: nada de "la mesa {cortesia} min" — "la mesa 15 min" se lee como "mesa nº 15"
   reservaConfirmada: {
-    es: '¡Reserva confirmada! ✅\n\n📅 {fecha} a las {hora}, {comensales} personas.\n\nTe guardamos la mesa {cortesia} min. ¡Te esperamos en {nombre}! 🥘 Para cancelar o cambiar la reserva, escríbeme por aquí.',
-    va: 'Reserva confirmada! ✅\n\n📅 {fecha} a les {hora}, {comensales} persones.\n\nEt guardem la taula {cortesia} min. T’esperem a {nombre}! 🥘 Per a cancel·lar o canviar la reserva, escriu-me per ací.',
-    en: 'Booking confirmed! ✅\n\n📅 {fecha} at {hora}, {comensales} people.\n\nWe will hold your table for {cortesia} min. See you at {nombre}! 🥘 To cancel or change your booking, just message us here.',
-    de: 'Reservierung bestätigt! ✅\n\n📅 {fecha} um {hora}, {comensales} Personen.\n\nWir halten Ihren Tisch {cortesia} Min. frei. Bis bald im {nombre}! 🥘 Zum Stornieren oder Ändern schreiben Sie uns einfach hier.',
-    fr: 'Réservation confirmée ! ✅\n\n📅 {fecha} à {hora}, {comensales} personnes.\n\nNous gardons votre table {cortesia} min. À bientôt chez {nombre} ! 🥘 Pour annuler ou modifier, écrivez-nous ici.',
+    es: '¡Reserva confirmada! ✅\n\n📅 {fecha} a las {hora}, {comensales} personas.\n\nTe guardamos sitio durante {cortesia} minutos. ¡Te esperamos en {nombre}! 🥘 Para cancelar o cambiar la reserva, escríbeme por aquí.',
+    va: 'Reserva confirmada! ✅\n\n📅 {fecha} a les {hora}, {comensales} persones.\n\nEt guardem lloc durant {cortesia} minuts. T’esperem a {nombre}! 🥘 Per a cancel·lar o canviar la reserva, escriu-me per ací.',
+    en: 'Booking confirmed! ✅\n\n📅 {fecha} at {hora}, {comensales} people.\n\nWe will hold your booking for {cortesia} minutes. See you at {nombre}! 🥘 To cancel or change your booking, just message us here.',
+    de: 'Reservierung bestätigt! ✅\n\n📅 {fecha} um {hora}, {comensales} Personen.\n\nWir halten Ihre Reservierung für {cortesia} Minuten frei. Bis bald im {nombre}! 🥘 Zum Stornieren oder Ändern schreiben Sie uns einfach hier.',
+    fr: 'Réservation confirmée ! ✅\n\n📅 {fecha} à {hora}, {comensales} personnes.\n\nNous gardons votre réservation pendant {cortesia} minutes. À bientôt chez {nombre} ! 🥘 Pour annuler ou modifier, écrivez-nous ici.',
   },
   // Reincidente (noshows >= 2): la reserva nace pendiente y sala decide
   reservaPendienteCliente: {

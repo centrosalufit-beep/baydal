@@ -48,7 +48,7 @@ function hoyLegible(): string {
  * Clasifica un mensaje libre del cliente en intención + datos de reserva
  * + idioma detectado. Usa tool-use forzado para obtener JSON fiable.
  */
-export async function interpretar(texto: string, contexto: string): Promise<Interpretacion> {
+export async function interpretar(texto: string, contexto: string, idiomaActual: Idioma = 'es'): Promise<Interpretacion> {
   try {
     const respuesta = await getCliente().messages.create({
       model: MODELO,
@@ -59,7 +59,9 @@ export async function interpretar(texto: string, contexto: string): Promise<Inte
         `a fechas YYYY-MM-DD FUTURAS respecto a hoy. Turno: comida (mediodía) o cena (noche). ` +
         `Extrae SOLO datos que el cliente mencione explícitamente. ` +
         `Detecta el idioma del mensaje (es/va/en/de/fr): "va" es valencià — si el cliente escribe ` +
-        `en valencià o catalán, el idioma es "va". Contexto de la conversación: ${contexto}`,
+        `en valencià o catalán, el idioma es "va". El idioma actual de la conversación es "${idiomaActual}": ` +
+        `mantenlo salvo que el mensaje esté CLARAMENTE escrito en otro idioma; con mensajes cortos o ` +
+        `ambiguos (nombres, números, "ok", "no"…) devuelve el actual. Contexto de la conversación: ${contexto}`,
       messages: [{ role: 'user', content: texto }],
       tools: [
         {
@@ -98,7 +100,7 @@ export async function interpretar(texto: string, contexto: string): Promise<Inte
     const intencion = INTENCIONES.includes(datos.intencion as Intencion)
       ? (datos.intencion as Intencion)
       : 'otro';
-    const idioma = IDIOMAS.includes(datos.idioma as Idioma) ? (datos.idioma as Idioma) : 'es';
+    const idioma = IDIOMAS.includes(datos.idioma as Idioma) ? (datos.idioma as Idioma) : idiomaActual;
 
     return {
       intencion,
@@ -115,7 +117,7 @@ export async function interpretar(texto: string, contexto: string): Promise<Inte
     };
   } catch (error) {
     console.error('[claude] interpretar falló:', error);
-    return { intencion: 'otro', datos: {}, idioma: 'es' }; // el flujo escala
+    return { intencion: 'otro', datos: {}, idioma: idiomaActual }; // el flujo escala
   }
 }
 
