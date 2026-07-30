@@ -11,6 +11,13 @@ DOMAIN = "https://baydal.es"
 TEL = "+34965831111"
 TEL_VISIBLE = "965 831 111"
 WA = "34965831111"  # bot de reservas (Paco) — antes recepción 34677490049
+WA_RESERVA_MSG = {"es": "Me gustaría reservar una mesa", "en": "I would like to book a table",
+                  "de": "Ich möchte gerne einen Tisch reservieren", "fr": "Je voudrais réserver une table"}
+
+
+def wa_reserva(lang):
+    from urllib.parse import quote
+    return f"https://wa.me/{WA}?text={quote(WA_RESERVA_MSG[lang])}"
 # Dirección oficial confirmada por David 13/07/2026 (Google/IG/Yelp dicen 12: corregirlos allí, no copiarlos)
 ADDRESS = "Avinguda del Port, 10"
 GEO = (38.6366, 0.0706)
@@ -598,7 +605,7 @@ def layout(lang, page, title, desc, body, extra_head=""):
     <a class="brand" href="{u('home',lang)}"><img src="/assets/img/logo-baydal.webp" alt="Restaurante Baydal — {t['since']}" width="500" height="135"></a>
     <input type="checkbox" id="nav-t" class="nav-t"><label for="nav-t" class="nav-b" aria-label="Menu"><span></span><span></span><span></span></label>
     <nav class="nav"><ul>{nav_items}</ul><div class="nav-langs">{lang_sw}</div></nav>
-    <a class="cta hd-cta" href="{u('reservas',lang)}">{t['nav']['reservar']}</a>
+    <a class="cta hd-cta" href="{wa_reserva(lang)}">{t['nav']['reservar']}</a>
   </div>
 </header>
 <main id="main">
@@ -651,7 +658,7 @@ def page_home(lang):
     <p class="kick">{t['since']} · Calp</p>
     <h1>{t['hero_h1']}</h1>
     <p class="sub">{t['hero_sub']}</p>
-    <p class="hero-cta"><a class="cta" href="{u('reservas',lang)}">{t['hero_cta1']}</a>
+    <p class="hero-cta"><a class="cta" href="{wa_reserva(lang)}">{t['hero_cta1']}</a>
     <a class="cta ghost" href="{u('carta',lang)}">{t['hero_cta2']}</a></p>
   </div>
 </section>
@@ -726,7 +733,7 @@ def page_carta(lang):
 <section class="menu-box" id="menu-baydal"><h2>{t['menu_baydal_t']}</h2><p class="sec-note">{t['menu_baydal_note']}</p><div class="mb-grid">{mb}</div></section>
 <section class="menu-sec" id="desayunos"><h2>{t['desayunos_t']}</h2><p>{t['desayunos_p']}</p></section>
 </div>
-<section class="cta-strip"><a class="cta" href="{u('reservas',lang)}">{t['nav']['reservar']}</a></section>"""
+<section class="cta-strip"><a class="cta" href="{wa_reserva(lang)}">{t['nav']['reservar']}</a></section>"""
     return layout(lang, "carta", title, desc, body, extra_head=schema_menu(lang))
 
 
@@ -747,7 +754,7 @@ def page_senyoret(lang):
 </section>
 <section class="faq"><h2>{t['seny_faq_t']}</h2>{faqs}</section>
 <section class="press"><h2>{x['fuentes_t']}</h2>{fuentes}</section>
-<section class="cta-strip"><a class="cta" href="{u('reservas',lang)}">{t['seny_cta']}</a></section>"""
+<section class="cta-strip"><a class="cta" href="{wa_reserva(lang)}">{t['seny_cta']}</a></section>"""
     return layout(lang, "senyoret", title, desc, body, extra_head=schema_faq(lang))
 
 
@@ -779,7 +786,7 @@ def page_historia(lang):
 <section class="timeline"><ul>{tl}</ul></section>
 <section class="press"><h2>{t['hist_press_t']}</h2>{press}</section>
 <section class="videos"><h2>{x['videos_t']}</h2><div class="vids">{videos}</div></section>
-<section class="cta-strip"><a class="cta" href="{u('reservas',lang)}">{t['nav']['reservar']}</a></section>"""
+<section class="cta-strip"><a class="cta" href="{wa_reserva(lang)}">{t['nav']['reservar']}</a></section>"""
     return layout(lang, "historia", title, desc, body)
 
 
