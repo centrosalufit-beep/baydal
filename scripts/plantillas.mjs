@@ -5,7 +5,9 @@
 //   node scripts/plantillas.mjs
 // Idempotente a efectos prácticos: si una plantilla/idioma ya existe, Meta lo dice y se sigue.
 
-const WABA_ID = '2004127973561093'; // cuenta de WhatsApp Business del Restaurante Baydal
+// OJO: al dar de alta el fijo 965831111 Meta creó una WABA NUEVA; la vieja
+// (2004127973561093) solo tiene el número de pruebas y sus plantillas no valen aquí.
+const WABA_ID = '1361659489375100'; // cuenta de WhatsApp Business del fijo 965831111
 const API = `https://graph.facebook.com/v23.0/${WABA_ID}/message_templates`;
 
 const token = (process.env.WHATSAPP_TOKEN ?? '').trim();
@@ -76,6 +78,18 @@ const PLANTILLAS = [
       en: 'Thank you for your visit, {{1}}! This is Paco from Restaurante Baydal 🥘 If you enjoyed it, would you leave us a Google review? It only takes a minute: {{2}} Thank you!',
       de: 'Vielen Dank für Ihren Besuch, {{1}}! Hier ist Paco vom Restaurante Baydal 🥘 Wenn es Ihnen gefallen hat, würden Sie uns eine Google-Bewertung hinterlassen? Es dauert nur eine Minute: {{2}} Vielen Dank!',
       fr: "Merci de votre visite, {{1}} ! C'est Paco du Restaurante Baydal 🥘 Si vous avez passé un bon moment, nous laisseriez-vous un avis Google ? Cela ne prend qu'une minute : {{2}} Merci !",
+    },
+  },
+  {
+    // Ficha operativa a sala (677490049): como plantilla no tiene ventana de 24h.
+    // Solo en español: sala es interna. El "— Paco" final evita acabar en variable.
+    name: 'ficha_reserva',
+    category: 'UTILITY',
+    ejemplos: ['✅ NUEVA RESERVA', '4 de agosto', '21:00', '4', 'María', '+34600000000', 'celíaco y una trona'],
+    botones: false,
+    cuerpos: {
+      // Meta exige bastante texto fijo en proporción a las variables
+      es: 'Aviso de Paco para el equipo de sala: {{1}}\nFECHA de la reserva: {{2}}\nHORA de entrada: {{3}}\nPERSONAS en la mesa: {{4}}\nNOMBRE del cliente: {{5}}\nTELÉFONO de contacto: {{6}}\nNOTAS del cliente: {{7}}\nGestión completa en el panel de reservas.',
     },
   },
 ];
