@@ -39,6 +39,10 @@ export interface Config {
   infoPractica: string;       // única fuente de Claude para dudas prácticas
   ubicacion: { lat: number; lng: number; direccion: string }; // pin al confirmar
   horario: { [dia: string]: HorarioDia }; // clave "0"(domingo).."6"(sábado)
+  // Aviso puntual tras confirmar una CENA de esa fecha (menús especiales:
+  // Nit del Foc, Nochevieja…). Clave YYYY-MM-DD. Vive en config para poder
+  // ponerlo y quitarlo sin desplegar; ausente = no se avisa de nada.
+  avisosPorFecha?: { [fecha: string]: TextoIdiomas };
 }
 
 /** festivos/{YYYY-MM-DD} — cierres puntuales */

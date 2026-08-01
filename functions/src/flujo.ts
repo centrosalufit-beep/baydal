@@ -705,6 +705,14 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
     await enviarUbicacion(ctx.telefono, u.lat, u.lng, ctx.config.nombre, u.direccion);
   }
 
+  // Aviso de menú especial (Nit del Foc y similares). Solo cenas: son eventos
+  // de noche. Se cae a español si falta el idioma para no mandar "undefined".
+  const aviso = ctx.config.avisosPorFecha?.[fecha];
+  if (aviso && turno === 'cena') {
+    const texto = aviso[ctx.idioma] || aviso.es;
+    if (texto) await enviarTexto(ctx.telefono, texto);
+  }
+
   // Aviso operativo a sala: SIEMPRE, en cada reserva (fuera de la franja también)
   await avisarSala(
     ctx,

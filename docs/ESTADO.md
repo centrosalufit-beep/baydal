@@ -26,6 +26,23 @@ Solución: `FUNCTIONS_DISCOVERY_TIMEOUT=120 firebase deploy --only functions`.
 El grupo de 150 pax que aparecía como `pendiente` para el 30/07 ("Es posible?")
 era un test de David: borrado el 01/08.
 
+## 🎆 Nit del Foc (5/08/2026) — ⚠️ CADUCA EL 6
+
+Menú especial de 30 €/persona, **único disponible esa noche** (no hay carta),
+con cava valenciano de cortesía y fuegos del Castell a la Mar a las 23:55.
+
+- `config.infoPractica`: lleva el menú completo → Paco responde dudas sobre él
+  en los 5 idiomas.
+- `config.avisosPorFecha`: entradas para `2026-08-04/05/06` en los 5 idiomas.
+  Al confirmar una **cena** de esas fechas, Paco manda un mensaje extra: el del
+  día 5 avisa de que el menú es obligatorio; los del 4 y el 6 lo ofrecen por si
+  quieren cambiarse.
+
+**EL 6 DE AGOSTO HAY QUE BORRAR** las tres entradas de `avisosPorFecha` y el
+párrafo `MENÚ NIT DEL FOC` de `infoPractica`, o Paco seguirá anunciando un
+evento pasado. Se hace desde Firestore o el panel, **sin desplegar** (por eso
+vive en config y no en el código).
+
 ## Contexto del problema (histórico, 01/08 mediodía)
 
 **Contexto**: el fijo 965 831 111 ya es el número de Paco y funciona. Al darlo

@@ -50,8 +50,16 @@ Este documento es el **contrato único** entre módulos. Cualquier cambio de mod
     }
   },
   // inicio/fin = rango de HORAS DE ENTRADA aceptadas (fin = última entrada, no cierre de cocina)
+  avisosPorFecha?: {         // OPCIONAL — menús especiales (Nit del Foc, Nochevieja…)
+    [fecha: string]: { es, va, en, de, fr }  // clave YYYY-MM-DD
+  },
 }
 ```
+`avisosPorFecha`: al confirmar una reserva de **cena** en esa fecha, Paco manda
+un mensaje extra con el texto en el idioma del cliente (cae a `es` si falta).
+Vive en config —y no en el código— para poder ponerlo y quitarlo sin desplegar:
+**hay que borrar la entrada cuando pase el evento** o Paco seguirá anunciándolo.
+
 (`duracionReservaMin` ya no existe: la ocupación es POR TURNO — ver motor.)
 
 ### `festivos/{YYYY-MM-DD}` — cierres puntuales. Hacer/deshacer = crear/borrar doc.
