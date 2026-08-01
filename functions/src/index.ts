@@ -91,9 +91,18 @@ async function procesarEntrada(body: unknown): Promise<void> {
   };
 
   for (const entry of cuerpo?.entry ?? []) {
+    console.log(`[webhook] WABA ${(entry as { id?: string }).id}`);
     for (const change of entry.changes ?? []) {
       const value = change.value;
       if (!value) continue;
+      // Los envíos que Meta rechaza en diferido (p.ej. 131047 fuera de la
+      // ventana de 24h) solo se ven aquí: sin esto fallan en silencio.
+      const statuses = (value as { statuses?: { status?: string; recipient_id?: string; errors?: unknown }[] }).statuses;
+      for (const st of statuses ?? []) {
+        if (st.status === 'failed') {
+          console.error(`[webhook] envío FALLIDO a ${st.recipient_id}: ${JSON.stringify(st.errors)}`);
+        }
+      }
       // Los statuses de Meta (sent/delivered/read) se ignoran en silencio
       for (const msg of value.messages ?? []) {
         if (!msg.id || !msg.from) continue;
