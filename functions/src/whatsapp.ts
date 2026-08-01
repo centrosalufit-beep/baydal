@@ -195,3 +195,69 @@ export function enviarPlantilla(
     `plantilla ${nombre}`
   );
 }
+
+// ── Avisos a sala (sin ventana de 24 h) ──────────────────────────────
+
+/** Las 7 variables de la plantilla `ficha_reserva`, en orden */
+export interface CamposFicha {
+  titulo: string;    // {{1}} "✅ NUEVA RESERVA"
+  fecha: string;     // {{2}} ya formateada para leer ("4 de agosto")
+  hora: string;      // {{3}}
+  personas: string;  // {{4}}
+  nombre: string;    // {{5}}
+  telefono: string;  // {{6}}
+  notas: string;     // {{7}}
+}
+
+/**
+ * Meta rechaza parámetros con saltos de línea, tabuladores o más de 4 espacios
+ * seguidos, y los corta a 1024 caracteres. Los vacíos van como "-" porque una
+ * variable vacía también invalida el envío.
+ */
+function aplanar(valor: string): string {
+  const limpio = (valor ?? '')
+    .replace(/[\r\n]+/g, ' · ')
+    .replace(/[\t ]+/g, ' ')
+    .trim();
+  return limpio === '' ? '-' : recortar(limpio, 1000);
+}
+
+/** Ficha multilínea legible: el respaldo por defecto y el formato de siempre */
+export function fichaMultilinea(c: CamposFicha): string {
+  return [
+    c.titulo,
+    `FECHA: ${c.fecha}`,
+    `HORA: ${c.hora}`,
+    `PERSONAS: ${c.personas}`,
+    `NOMBRE: ${c.nombre}`,
+    `TELÉFONO: ${c.telefono}`,
+    `NOTAS: ${c.notas || '-'}`,
+  ].join('\n');
+}
+
+/**
+ * Aviso operativo a sala. Va primero por la plantilla `ficha_reserva`, que NO
+ * tiene ventana de 24 h; si Meta la rechaza (aún sin aprobar, o la WABA sin
+ * método de pago) cae al texto libre de siempre, que sí depende de la ventana.
+ * `respaldo` permite conservar un formato propio (resumen diario, escalados).
+ */
+export async function enviarFichaSala(
+  a: string,
+  campos: CamposFicha,
+  respaldo?: string
+): Promise<boolean> {
+  const params = [
+    campos.titulo,
+    campos.fecha,
+    campos.hora,
+    campos.personas,
+    campos.nombre,
+    campos.telefono,
+    campos.notas,
+  ].map(aplanar);
+
+  if (await enviarPlantilla(a, 'ficha_reserva', 'es', params)) return true;
+
+  console.warn('[whatsapp] ficha_reserva rechazada; se intenta texto libre (sujeto a la ventana de 24 h)');
+  return enviarTexto(a, respaldo ?? fichaMultilinea(campos));
+}

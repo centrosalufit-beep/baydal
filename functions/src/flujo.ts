@@ -16,7 +16,15 @@ import {
   mesasLibres,
   sumarDias,
 } from './disponibilidad';
-import { enviarBotones, enviarLista, enviarTexto, enviarUbicacion, type FilaLista } from './whatsapp';
+import {
+  enviarBotones,
+  enviarFichaSala,
+  enviarLista,
+  enviarTexto,
+  enviarUbicacion,
+  type CamposFicha,
+  type FilaLista,
+} from './whatsapp';
 import { interpretar, responderCarta, responderInfo } from './claude';
 
 const REINICIO_MS = 30 * 60 * 1000; // conversación caducada a los 30 min
@@ -700,11 +708,14 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
   // Aviso operativo a sala: SIEMPRE, en cada reserva (fuera de la franja también)
   await avisarSala(
     ctx,
-    fichaReserva(
-      reincidente ? '🟡 RESERVA PENDIENTE (reincidente)' : '✅ NUEVA RESERVA',
-      { fecha, hora, comensales, nombre },
-      [`TELÉFONO: +${ctx.telefono}`]
-    )
+    fichaReserva(reincidente ? '🟡 RESERVA PENDIENTE (reincidente)' : '✅ NUEVA RESERVA', {
+      fecha,
+      hora,
+      comensales,
+      nombre,
+      telefono: ctx.telefono,
+      notas: borrador.notas ?? '',
+    })
   );
 }
 
@@ -740,11 +751,14 @@ async function crearReservaGrupo(ctx: Ctx, borrador: Borrador): Promise<void> {
   await enviarTexto(ctx.telefono, t(ctx.idioma, 'grupoRecibido'));
   await avisarSala(
     ctx,
-    fichaReserva(
-      '🟡 GRUPO PENDIENTE',
-      { fecha: fecha!, hora: hora!, comensales: comensales!, nombre: nombre! },
-      [`TELÉFONO: +${ctx.telefono}`, 'Decidir en el panel']
-    )
+    fichaReserva('🟡 GRUPO PENDIENTE', {
+      fecha: fecha!,
+      hora: hora!,
+      comensales: comensales!,
+      nombre: nombre!,
+      telefono: ctx.telefono,
+      notas: [borrador.notas, 'Decidir en el panel'].filter(Boolean).join(' · '),
+    })
   );
 }
 
@@ -835,6 +849,8 @@ async function cancelarReserva(ctx: Ctx, reservaId: string): Promise<void> {
       hora: reserva.hora,
       comensales: reserva.comensales,
       nombre: reserva.nombre,
+      telefono: reserva.telefono,
+      notas: reserva.notas,
     })
   );
   await enviarMenu(ctx); // por si quiere volver a reservar (modificar = cancelar + reservar)
@@ -849,7 +865,23 @@ async function escalar(ctx: Ctx, conv: Conversacion, motivo: string): Promise<vo
     await enviarBotones(ctx.telefono, t(ctx.idioma, 'escalado', { telefono: ctx.config.telefonoHumano }), [
       { id: 'menu_volver', titulo: t(ctx.idioma, 'btnVolverMenu') },
     ]);
-    await enviarTexto(ctx.config.whatsappHumano, `⚠️ Bot: ${resumenEscalado(ctx, conv, motivo)}`);
+    const resumen = resumenEscalado(ctx, conv, motivo);
+    const ahora = ahoraMadrid();
+    // El escalado no es una reserva: los huecos del formato ficha van a "-" y
+    // el detalle entero viaja aplanado en NOTAS (la plantilla no admite saltos).
+    await avisarSala(
+      ctx,
+      {
+        titulo: '⚠️ ATENCIÓN MANUAL',
+        fecha: formatearFecha(ahora.fecha, 'es'),
+        hora: ahora.hora,
+        personas: String(conv.borrador?.comensales ?? '-'),
+        nombre: conv.borrador?.nombre ?? ctx.nombrePerfil ?? '-',
+        telefono: `+${ctx.telefono}`,
+        notas: resumen,
+      },
+      `⚠️ Bot: ${resumen}`
+    );
   } else {
     // Buzón nocturno: no suena el móvil de Jose; el resumenDiario lo entrega a las 9:31
     await enviarBotones(
@@ -877,23 +909,28 @@ function resumenEscalado(ctx: Ctx, conv: Conversacion, motivo: string): string {
   );
 }
 
-/** Aviso operativo inmediato al WhatsApp de recepción (siempre, a cualquier hora) */
-async function avisarSala(ctx: Ctx, texto: string): Promise<void> {
-  await enviarTexto(ctx.config.whatsappHumano, texto);
+/**
+ * Aviso operativo inmediato al WhatsApp de recepción (siempre, a cualquier hora).
+ * Va por plantilla para no depender de la ventana de 24 h de WhatsApp.
+ */
+async function avisarSala(ctx: Ctx, campos: CamposFicha, respaldo?: string): Promise<void> {
+  await enviarFichaSala(ctx.config.whatsappHumano, campos, respaldo);
 }
 
-/** Ficha multilínea para los avisos a sala: título + FECHA/HORA/PERSONAS/NOMBRE (+extras) */
-function fichaReserva(
+/** Campos de la ficha a sala a partir de una reserva (formato de la plantilla) */
+export function fichaReserva(
   titulo: string,
-  r: { fecha: string; hora: string; comensales: number; nombre: string },
-  extras: string[] = []
-): string {
-  const fechaLarga = new Intl.DateTimeFormat('es-ES', {
-    timeZone: 'UTC', // fecha de calendario; a mediodía UTC no hay ambigüedad
-    day: 'numeric',
-    month: 'long',
-  }).format(new Date(`${r.fecha}T12:00:00Z`));
-  return [titulo, `FECHA: ${fechaLarga}`, `HORA: ${r.hora}`, `PERSONAS: ${r.comensales}`, `NOMBRE: ${r.nombre}`, ...extras].join('\n');
+  r: { fecha: string; hora: string; comensales: number; nombre: string; telefono: string; notas?: string }
+): CamposFicha {
+  return {
+    titulo,
+    fecha: formatearFecha(r.fecha, 'es'),
+    hora: r.hora,
+    personas: String(r.comensales),
+    nombre: r.nombre,
+    telefono: `+${r.telefono}`,
+    notas: r.notas ?? '',
+  };
 }
 
 /** true si la hora actual de Madrid cae dentro de config.atencionHumana */

@@ -11,8 +11,8 @@ import { defineSecret } from 'firebase-functions/params';
 import { initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore, Timestamp, type Query } from 'firebase-admin/firestore';
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { enviarPlantilla, enviarTexto, enviarUbicacion, inicializarWhatsApp } from './whatsapp';
-import { formatearFecha, procesarMensaje, type MensajeEntrante } from './flujo';
+import { enviarFichaSala, enviarPlantilla, enviarTexto, enviarUbicacion, inicializarWhatsApp } from './whatsapp';
+import { fichaReserva, formatearFecha, procesarMensaje, type MensajeEntrante } from './flujo';
 import { transcribir } from './claude';
 import { manejarWpApi } from './wpapi';
 import { t } from './textos';
@@ -368,9 +368,16 @@ export const liberarNoConfirmadas = onSchedule(
         // Contrato ALTA_META: {{1}} hora, {{2}} teléfono del restaurante
         await enviarPlantilla(r.telefono, 'reserva_liberada', r.idioma, [r.hora, config?.telefonoHumano ?? '']);
         if (config) {
-          await enviarTexto(
+          await enviarFichaSala(
             config.whatsappHumano,
-            `🔓 Liberada por no confirmar: hoy ${r.turno} ${r.hora} · ${r.comensales} pax · ${r.nombre}`
+            fichaReserva('🔓 LIBERADA (sin confirmar)', {
+              fecha: r.fecha,
+              hora: r.hora,
+              comensales: r.comensales,
+              nombre: r.nombre,
+              telefono: r.telefono,
+              notas: [`turno ${r.turno}`, r.notas].filter(Boolean).join(' · '),
+            })
           );
         }
       } else if (!r.avisoLiberacionEnviado) {
@@ -439,7 +446,22 @@ export const resumenDiario = onSchedule(
       }
     }
 
-    const enviado = await enviarTexto(config.whatsappHumano, lineas.join('\n'));
+    // Por plantilla (sin ventana de 24 h): el resumen entero va aplanado en
+    // NOTAS; el respaldo por texto libre conserva el formato de siempre.
+    const texto = lineas.join('\n');
+    const enviado = await enviarFichaSala(
+      config.whatsappHumano,
+      {
+        titulo: '📋 RESUMEN DEL DÍA',
+        fecha: formatearFecha(hoy, 'es'),
+        hora: '-',
+        personas: '-', // los totales ya van dentro del resumen
+        nombre: '-',
+        telefono: '-',
+        notas: texto,
+      },
+      texto
+    );
 
     // El buzón solo se vacía si el resumen ha llegado de verdad; si el envío
     // falla, los avisos esperan al resumen de mañana.

@@ -1,8 +1,32 @@
 # Estado — Paco (chatbot WhatsApp)
 
-_Última revisión: 01/08/2026 (mediodía) — sesión cortada por tokens; SEGUIR AQUÍ_
+_Última revisión: 01/08/2026 (13:00) — **ventana de 24 h RESUELTA**, ver abajo._
 
-## ⚡ PUNTO DE CONTINUACIÓN (01/08)
+## ✅ CERRADO EL 01/08 (tarde): la ventana de 24 h
+
+El problema de los avisos a sala está **resuelto de punta a punta**:
+
+1. **22 plantillas APPROVED** en la WABA nueva, `ficha_reserva[es]` incluida.
+2. **Método de pago añadido a la WABA `1361659489375100`.** Era el bloqueo real:
+   `health_status.can_send_message` daba `BLOCKED` con error 141006. Ojo, esto
+   no solo tumbaba las fichas a sala: bloqueaba **todas** las plantillas
+   proactivas (recordatorios, liberaciones, reseñas) desde el 30/07. Ahora las
+   tres entidades (WABA, BUSINESS, APP) dan `AVAILABLE`.
+3. **Desplegadas las 7 funciones** con `enviarFichaSala`. Sala recibe cada
+   reserva por plantilla; nadie tiene que escribir "ok" a diario.
+4. **Reenvío cerrado**: de las 14 reservas creadas desde el 30/07, 6 estaban
+   completadas y 5 canceladas; las 3 vivas (Flamao, Ivan, Théo) ya se habían
+   reenviado a mano a mediodía. Se mandó un único recordatorio de esas 3 el
+   01/08 a las 12:51 (`wamid.HBgLMzQ2Nzc0OTAwNDkVAgARGBI3NUJDNDcwQTI1Mzc5RjQwNjQA`).
+
+**Nota de despliegue**: en máquinas lentas el análisis previo se pasa de los
+10 s por defecto y aborta con "Cannot determine backend specification".
+Solución: `FUNCTIONS_DISCOVERY_TIMEOUT=120 firebase deploy --only functions`.
+
+El grupo de 150 pax que aparecía como `pendiente` para el 30/07 ("Es posible?")
+era un test de David: borrado el 01/08.
+
+## Contexto del problema (histórico, 01/08 mediodía)
 
 **Contexto**: el fijo 965 831 111 ya es el número de Paco y funciona. Al darlo
 de alta, Meta creó una **WABA NUEVA: `1361659489375100`** (la vieja
@@ -21,22 +45,27 @@ los mensajes libres solo se entregan si recepción escribió al bot en las
 - Nombre visible "Baydal reservas" APROBADO; perfil del número completo
   (logo 640×640, dirección, web, descripción, vertical RESTAURANT).
 
-**SIGUIENTE PASO (diseño decidido, sin implementar)** — para que nadie tenga
-que escribir "ok" a diario, los avisos a sala pasan a plantilla:
-1. Esperar plantillas APPROVED (comprobar:
-   `GET graph.facebook.com/v23.0/1361659489375100/message_templates`).
-2. **Tarjeta en la WABA NUEVA** (David, en Business Manager → Facturación →
-   cuenta del 965 831 111): sin ella las plantillas no salen. La que se puso
-   estaba en la WABA vieja.
-3. Código: helper `enviarFichaSala(a, campos)` en `whatsapp.ts` — intenta
-   plantilla `ficha_reserva` (params: titulo, fecha, hora, personas, nombre,
-   telefono, notas; aplanar saltos de línea a " · ", vacíos a "-") y si Meta
-   la rechaza (aún no aprobada) cae a `enviarTexto` con la ficha multilínea.
-   Usarlo en: `flujo.ts` → `crearReserva`, `crearReservaGrupo`,
-   `cancelarReserva` y `escalar` (resumen aplanado en notas); `index.ts` →
-   aviso "🔓 Liberada" (L.371) y `resumenDiario` (L.442, aplanado).
-4. Mientras tanto (workaround): un "ok" desde 677 490 049 al fijo reabre
-   la ventana 24 h.
+**CÓDIGO IMPLEMENTADO Y DESPLEGADO (01/08 tarde)** — los avisos a sala van por
+plantilla:
+- `enviarFichaSala(a, campos, respaldo?)` en `whatsapp.ts`: intenta la plantilla
+  `ficha_reserva` (7 params: titulo, fecha, hora, personas, nombre, telefono,
+  notas; saltos de línea → " · ", vacíos → "-", corte a 1000 caracteres) y si
+  Meta la rechaza cae a `enviarTexto`. Ya en uso en `flujo.ts` (`crearReserva`,
+  `crearReservaGrupo`, `cancelarReserva`, `escalar`) e `index.ts` (aviso
+  "🔓 LIBERADA" y `resumenDiario`, ambos aplanados en NOTAS).
+- 3 tests nuevos en `whatsapp.test.ts` (58 en verde en total).
+- `scripts/reenviar-fichas.mjs`: manda a sala la lista de reservas perdidas en
+  un solo mensaje (simulación por defecto; `--enviar`, `--desde`).
+
+**Comprobaciones útiles** (con `$env:WHATSAPP_TOKEN` cargado desde el secret):
+
+```
+# ¿puede la WABA enviar plantillas? (aquí se ve un impago)
+(irm "https://graph.facebook.com/v23.0/1361659489375100?fields=health_status" -Headers @{Authorization="Bearer $env:WHATSAPP_TOKEN"}).health_status | ConvertTo-Json -Depth 8
+
+# estado de aprobación de las plantillas
+(irm "https://graph.facebook.com/v23.0/1361659489375100/message_templates?fields=name,language,status&limit=100" -Headers @{Authorization="Bearer $env:WHATSAPP_TOKEN"}).data | Format-Table
+```
 
 ## Hecho el 30/07/2026
 
