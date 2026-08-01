@@ -38,10 +38,20 @@ con cava valenciano de cortesía y fuegos del Castell a la Mar a las 23:55.
   día 5 avisa de que el menú es obligatorio; los del 4 y el 6 lo ofrecen por si
   quieren cambiarse.
 
-**EL 6 DE AGOSTO HAY QUE BORRAR** las tres entradas de `avisosPorFecha` y el
-párrafo `MENÚ NIT DEL FOC` de `infoPractica`, o Paco seguirá anunciando un
-evento pasado. Se hace desde Firestore o el panel, **sin desplegar** (por eso
-vive en config y no en el código).
+Ambas cosas las pone `scripts/nit-del-foc.mjs` (idempotente, con los textos de
+los 5 idiomas dentro).
+
+**EL 6 DE AGOSTO**, un solo comando y listo — **sin desplegar**, por eso vive en
+config y no en el código:
+
+```
+node scripts/nit-del-foc.mjs --borrar
+```
+
+Quita las tres entradas de `avisosPorFecha` y el párrafo `MENÚ NIT DEL FOC` de
+`infoPractica`. Si no se hace, Paco seguirá anunciando un evento pasado.
+La ida y vuelta está probada en producción (01/08): 1331 caracteres → borrado →
+1331 caracteres.
 
 ## Contexto del problema (histórico, 01/08 mediodía)
 
