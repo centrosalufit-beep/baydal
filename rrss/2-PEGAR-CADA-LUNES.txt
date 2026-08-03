@@ -1,0 +1,75 @@
+Genera el plan de la semana según las instrucciones del proyecto.
+
+<entrada_semana>
+SEMANA: 2026-W__  (del __ al __ de ______)
+PILARES ASIGNADOS (no elijas otros):
+  cartel   → ______
+  carrusel → ______
+IDIOMA_FEED: ______   (es / en / de — ver tabla de rotación al final)
+QUÉ HAY ESTA SEMANA (lonja, producto, ocupación, festivos locales, tiempo, incidencias):
+  ______
+HISTORIAL DE LAS 4 SEMANAS ANTERIORES — no repitas ni plato, ni gancho de apertura, ni estructura:
+  ______
+</entrada_semana>
+
+Genera 6 conceptos por dentro, quédate con los mejores y devuelve solo el JSON.
+
+
+================================================================================
+CHULETA — no hace falta pegar esto, es para rellenar los huecos de arriba
+================================================================================
+
+ROTACIÓN DE PILARES (ciclo de 8 semanas, luego vuelta a empezar)
+
+  Semana A   cartel PRODUCTO_LONJA   carrusel DECISION      idioma es
+  Semana B   cartel ESPECIE_RARA     carrusel ARROZ         idioma es
+  Semana C   cartel ARROZ            carrusel HISTORIA_85   idioma EN
+  Semana D   cartel ENTORNO          carrusel DECISION      idioma es
+  Semana E   cartel HISTORIA_85      carrusel ARROZ         idioma es
+  Semana F   cartel PRODUCTO_LONJA   carrusel EQUIPO        idioma DE
+  Semana G   cartel ESPECIE_RARA     carrusel ENTORNO       idioma es
+  Semana H   cartel ARROZ            carrusel DECISION      idioma es
+
+Ajustes de temporada:
+  Verano — sube ENTORNO, baja HISTORIA_85. Historias: 3 EN / 1 DE / 1 ES.
+  Nov-mar — sube HISTORIA_85 y PRODUCTO_LONJA. En invierno se decide con antelación,
+            no por impulso, y el residente extranjero está aquí todo el año.
+
+CUÁNDO PUBLICAR
+  Martes a viernes. Cartel a las 11:30 (franja de decisión de comida) o carrusel a las
+  19:30 (pico de alcance). Sábado y domingo, solo historias: son el mínimo de engagement
+  en feed. El lunes, con el restaurante cerrado, se graba y se programa.
+
+FECHAS QUE HAY QUE METER EN "QUÉ HAY ESTA SEMANA"
+  16 julio ......... Virgen del Carmen, patrona de los pescadores. La fecha más
+                     desaprovechada de Baydal: casa de 1941 sobre el puerto pesquero.
+                     Nadie más en Calp tiene ese derecho narrativo.
+  31 jul - 9 ago ... Fiestas Patronales, Virgen de las Nieves. Día grande el 5.
+                     Las 48 h de más tráfico del año en Calp.
+  ~22 octubre ...... Moros i Cristians. 2026 = 50 aniversario. "85 años de casa, 50 de
+                     fiesta". Confirmar fechas exactas en morosycristianos.calpe.es
+  9 octubre ........ Día de la Comunitat Valenciana.
+  1 noviembre ...... Arranca la campaña de Navidad. Publicar el carrusel de menú el 1 y
+                     republicarlo con otro gancho el 15 y el 29: cada pieza vive 72 horas.
+  Mediados de sept.. Arranca la campaña de comidas de empresa. Mayor ticket, decisión
+                     más temprana.
+  L-V a las 17:00 ... Subasta de la lonja. El contenido recurrente más fácil y más
+                     defendible que tiene la casa.
+
+QUÉ NO SE AUTOMATIZA
+  - Verificar precios y disponibilidad. El modelo inventa.
+  - Hacer la foto. Un móvil basta.
+  - Leer las tildes al 200%. Una tilde flotando pasa desapercibida de reojo. En alemán,
+    vigila además la ß y las diéresis.
+  - Aprobar el cartel antes de programar.
+  - Contestar DMs y comentarios. Automatizarlo es el disparador de sanción mejor
+    documentado de Instagram.
+
+LEGAL
+  Desde el 2 de agosto de 2026 el artículo 50 del Reglamento europeo de IA obliga a que
+  sea evidente que una imagen ha sido generada o manipulada por IA. Meta lo detecta solo
+  (lee los manifiestos C2PA que ChatGPT incrusta) y etiqueta igualmente, así que
+  declararlo no cuesta nada y no declararlo no lo oculta. Marca la casilla de contenido
+  IA al programar. El riesgo que llega antes no es el del etiquetado, sino el de
+  publicidad engañosa: una imagen de un plato que no se corresponde con el que se sirve.
+  De ahí la regla de la foto real.
