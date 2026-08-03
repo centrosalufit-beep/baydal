@@ -6,7 +6,7 @@ alemán, francés y español, con los prompts de imagen listos para pegar.
 ## Montaje (una sola vez)
 
 1. Crea un Proyecto en ChatGPT: **RRSS Baydal**.
-2. Sube **`BASE-BAYDAL.md`** como archivo del Proyecto.
+2. Sube **`BASE-BAYDAL.txt`** como archivo del Proyecto.
 3. Pega **`INSTRUCCIONES-PROYECTO.txt`** entero en *Instrucciones del proyecto*. Son 7.217
    caracteres: el límite es de 8.000, así que entra con margen.
 
@@ -98,7 +98,7 @@ de un plato que no se corresponde con el que se sirve. De ahí la regla de la fo
 | Fichero | Qué es |
 |---|---|
 | `INSTRUCCIONES-PROYECTO.txt` | El motor. Va en *Instrucciones del proyecto*. 7.217 caracteres |
-| `BASE-BAYDAL.md` | La base de conocimiento. Se sube como archivo del Proyecto |
+| `BASE-BAYDAL.txt` | La base de conocimiento. Se sube como archivo del Proyecto |
 | `LEEME.md` | Esto |
 
 Las notas de prensa, el pack de Google Business y la especificación de Wikidata están en
