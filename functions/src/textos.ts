@@ -82,6 +82,13 @@ export const TEXTOS = {
     de: 'Leider haben wir an diesem Tag geschlossen. Passt Ihnen ein anderes Datum?',
     fr: 'Désolé, nous sommes fermés ce jour-là. Une autre date vous conviendrait-elle ?',
   },
+  fechaUltimaHora: {
+    es: 'Para reservas con menos de {horas} horas de antelación no puedo confirmarte mesa por aquí. Llámanos directamente al {telefono} y te lo gestionamos al momento 🥘',
+    va: 'Per a reserves amb menys de {horas} hores d’antelació no puc confirmar-te taula per ací. Telefona’ns directament al {telefono} i t’ho gestionem al moment 🥘',
+    en: 'For bookings less than {horas} hours ahead I cannot confirm a table here. Please call us directly at {telefono} and we will arrange it right away.',
+    de: 'Reservierungen mit weniger als {horas} Stunden Vorlauf kann ich hier leider nicht bestätigen. Rufen Sie uns bitte direkt unter {telefono} an, wir kümmern uns sofort darum.',
+    fr: 'Pour les réservations à moins de {horas} heures, je ne peux pas confirmer de table ici. Appelez-nous directement au {telefono}, nous nous en occupons tout de suite.',
+  },
 
   // ── Paso TURNO ───────────────────────────────────────────────────
   pideTurno: {

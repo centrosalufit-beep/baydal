@@ -6,6 +6,7 @@ import assert from 'node:assert';
 import {
   ahoraMadrid,
   asignarMesa,
+  esUltimaHora,
   horasDelTurno,
   horasDisponibles,
   mesasLibres,
@@ -257,6 +258,19 @@ test('horasDisponibles aplica antelacionMaxDias', () => {
     horasDisponibles(config, mesas, [], '2026-08-22', 'comida', 2, null, ahora),
     []
   );
+});
+
+test('esUltimaHora: hoy con horas por llegar pero todas dentro del margen → true', () => {
+  // Sábado 21:00 Madrid: quedan cenas (21:30..22:30) pero todas a <2h → llamar
+  assert.strictEqual(esUltimaHora(config, SABADO, null, new Date('2026-07-18T19:00:00Z')), true);
+  // Sábado 12:00 Madrid: la comida aún tiene horas fuera del margen → false
+  assert.strictEqual(esUltimaHora(config, SABADO, null, new Date('2026-07-18T10:00:00Z')), false);
+  // Sábado 23:30 Madrid: ya no queda ninguna hora por llegar → false (cerrado)
+  assert.strictEqual(esUltimaHora(config, SABADO, null, new Date('2026-07-18T21:30:00Z')), false);
+  // Lunes (cerrado) → false aunque sea hoy
+  assert.strictEqual(esUltimaHora(config, LUNES, null, new Date('2026-07-20T19:00:00Z')), false);
+  // Otra fecha distinta de hoy → false
+  assert.strictEqual(esUltimaHora(config, SABADO, null, new Date('2026-07-17T19:00:00Z')), false);
 });
 
 test('ahoraMadrid: madrugada española → fecha de Madrid, no la de UTC', () => {

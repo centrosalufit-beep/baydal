@@ -11,6 +11,7 @@ import {
   aMinutos,
   asignarMesa,
   diferenciaDias,
+  esUltimaHora,
   horasDelTurno,
   horasDisponibles,
   mesasLibres,
@@ -508,7 +509,10 @@ async function pedirTurno(ctx: Ctx, borrador: Borrador): Promise<void> {
   const hayComida = horasAbiertas(ctx.config, fecha, 'comida', festivo).length > 0;
   const hayCena = horasAbiertas(ctx.config, fecha, 'cena', festivo).length > 0;
 
-  if (!hayComida && !hayCena) return avisarFechaInvalida(ctx, { ...borrador, fecha: undefined }, 'cerrada');
+  if (!hayComida && !hayCena) {
+    const validez = esUltimaHora(ctx.config, fecha, festivo) ? 'ultimaHora' : 'cerrada';
+    return avisarFechaInvalida(ctx, { ...borrador, fecha: undefined }, validez);
+  }
   // Si solo hay un turno posible, lo elegimos por el cliente
   if (hayComida !== hayCena) return siguientePaso(ctx, { ...borrador, turno: hayComida ? 'comida' : 'cena' });
 
@@ -981,7 +985,7 @@ async function guardarConv(ctx: Ctx, paso: Paso, borrador: Borrador): Promise<vo
   });
 }
 
-type ValidezFecha = 'ok' | 'noValida' | 'fueraRango' | 'cerrada';
+type ValidezFecha = 'ok' | 'noValida' | 'fueraRango' | 'cerrada' | 'ultimaHora';
 
 async function validarFecha(ctx: Ctx, fecha: string): Promise<ValidezFecha> {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return 'noValida';
@@ -994,7 +998,8 @@ async function validarFecha(ctx: Ctx, fecha: string): Promise<ValidezFecha> {
   const abierto =
     horasAbiertas(ctx.config, fecha, 'comida', festivo).length > 0 ||
     horasAbiertas(ctx.config, fecha, 'cena', festivo).length > 0;
-  return abierto ? 'ok' : 'cerrada';
+  if (abierto) return 'ok';
+  return esUltimaHora(ctx.config, fecha, festivo) ? 'ultimaHora' : 'cerrada';
 }
 
 async function avisarFechaInvalida(ctx: Ctx, borrador: Borrador, validez: ValidezFecha): Promise<void> {
@@ -1003,6 +1008,11 @@ async function avisarFechaInvalida(ctx: Ctx, borrador: Borrador, validez: Valide
     await enviarTexto(ctx.telefono, t(ctx.idioma, 'fechaFueraRango', { dias: ctx.config.antelacionMaxDias }));
   } else if (validez === 'cerrada') {
     await enviarTexto(ctx.telefono, t(ctx.idioma, 'fechaCerrada'));
+  } else if (validez === 'ultimaHora') {
+    await enviarTexto(
+      ctx.telefono,
+      t(ctx.idioma, 'fechaUltimaHora', { horas: ctx.config.antelacionMinHoras, telefono: ctx.config.telefonoHumano })
+    );
   } else {
     await enviarTexto(ctx.telefono, t(ctx.idioma, 'fechaNoValida'));
   }

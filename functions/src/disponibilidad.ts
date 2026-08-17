@@ -184,5 +184,21 @@ export function horasDisponibles(
   return cabe ? horas : [];
 }
 
+/**
+ * true si `fecha` es hoy y el horario del día aún tiene alguna hora de
+ * entrada por llegar, pero todas caen dentro de la antelación mínima:
+ * el bot ya no puede confirmar y toca llamar por teléfono.
+ */
+export function esUltimaHora(config: Config, fecha: string, festivo?: Festivo | null, ahora?: Date): boolean {
+  const madrid = ahoraMadrid(ahora);
+  if (fecha !== madrid.fecha) return false;
+  const min = aMinutos(madrid.hora);
+  const futuras = [
+    ...horasDelTurno(config, fecha, 'comida', festivo),
+    ...horasDelTurno(config, fecha, 'cena', festivo),
+  ].filter((h) => aMinutos(h) >= min);
+  return futuras.length > 0 && futuras.every((h) => aMinutos(h) < min + config.antelacionMinHoras * 60);
+}
+
 // Reexporte de tipos usados por consumidores del motor
 export type { Mesa, MesaConId };
