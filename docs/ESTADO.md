@@ -1,6 +1,15 @@
 # Estado — Paco (chatbot WhatsApp)
 
-_Última revisión: 01/08/2026 (13:00) — **ventana de 24 h RESUELTA**, ver abajo._
+_Última revisión: 17/08/2026 — mensaje de última hora desplegado._
+
+## ✅ 17/08: reserva de última hora → invitar a llamar (DESPLEGADO)
+
+Si hoy quedan horas de entrada por llegar pero todas caen dentro de la
+antelación mínima (2 h), Paco ya no decía la verdad ("ese día estamos
+cerrados"): ahora detecta el caso (`esUltimaHora` en disponibilidad.ts) y
+envía `fechaUltimaHora` (5 idiomas): reservas a menos de {horas} h → llamar
+al {telefono} (config.telefonoHumano). Commit `4d03c5f`; las 7 funciones
+redesplegadas ese día sin incidencias.
 
 ## ✅ CERRADO EL 01/08 (tarde): la ventana de 24 h
 
