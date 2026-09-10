@@ -1,6 +1,18 @@
 # Estado — Paco (chatbot WhatsApp)
 
-_Última revisión: 17/08/2026 — mensaje de última hora desplegado._
+_Última revisión: 10/09/2026 — garantía con Teya programada, SIN desplegar._
+
+## 🟡 10/09: garantía de reserva con Teya (CÓDIGO LISTO, NO DESPLEGADO)
+
+Retención de 20 € (configurable) en tarjeta con enlace de pre-autorización de
+Teya, uno por reserva; se cobra si no vienen sin avisar con 24 h. Todo en
+[`GARANTIA.md`](GARANTIA.md) y SCHEMA.md → "Garantía". Tests 61/61.
+**Falta**: David genera credenciales en el Business Portal de Teya
+(Integraciones) → secrets `TEYA_CLIENT_ID`/`TEYA_CLIENT_SECRET` → deploy →
+prueba con 1 € → activar en Ajustes del panel. Nuevas funciones:
+`revisarGarantiasProgramado` (cada 5 min) y `teyaWebhook`.
+Horario del bot ya correcto para septiembre (cena solo vie/sáb; comida
+13:00–16:00 de entrada), no se tocó.
 
 ## ✅ 17/08: reserva de última hora → invitar a llamar (DESPLEGADO)
 

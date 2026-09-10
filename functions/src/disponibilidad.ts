@@ -62,6 +62,12 @@ function diferenciaMinutos(fechaA: string, horaA: string, fechaB: string, horaB:
   return diferenciaDias(fechaA, fechaB) * 1440 + (aMinutos(horaB) - aMinutos(horaA));
 }
 
+/** Minutos que faltan (hora de Madrid) para una reserva; negativo si ya pasó */
+export function minutosHasta(fecha: string, hora: string, ahora: Date = new Date()): number {
+  const m = ahoraMadrid(ahora);
+  return diferenciaMinutos(m.fecha, m.hora, fecha, hora);
+}
+
 // ── Motor de disponibilidad ──────────────────────────────────────────
 
 /**

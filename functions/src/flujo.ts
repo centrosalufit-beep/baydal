@@ -3,8 +3,8 @@
 // NOTAS → CONFIRMAR, más GRUPO_DATOS (>maxComensalesBot), CANCELAR_ELEGIR y
 // ESPERANDO_HUMANO. Ids de payload EXACTOS del SCHEMA.
 
-import { FieldPath, FieldValue, getFirestore, type Firestore } from 'firebase-admin/firestore';
-import type { Borrador, Cliente, Config, Conversacion, Festivo, Idioma, Mesa, MesaConId, Paso, Reserva, SeccionCarta, Turno } from './tipos';
+import { FieldPath, FieldValue, getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestore';
+import type { Borrador, Cliente, Config, Conversacion, Festivo, Garantia, Idioma, Mesa, MesaConId, Paso, Reserva, SeccionCarta, Turno } from './tipos';
 import { t } from './textos';
 import {
   ahoraMadrid,
@@ -15,8 +15,10 @@ import {
   horasDelTurno,
   horasDisponibles,
   mesasLibres,
+  minutosHasta,
   sumarDias,
 } from './disponibilidad';
+import { crearRetencion } from './teya';
 import {
   enviarBotones,
   enviarFichaSala,
@@ -30,6 +32,12 @@ import { interpretar, responderCarta, responderInfo } from './claude';
 
 const REINICIO_MS = 30 * 60 * 1000; // conversación caducada a los 30 min
 const SILENCIO_HUMANO_MS = 4 * 60 * 60 * 1000; // 4 h sin bot tras escalado
+export const MINUTOS_GARANTIA = 30; // plazo para dejar la retención; si no, la mesa se libera
+
+/** Garantía activa en config (retención Teya por reserva del bot) */
+function pideGarantia(config: Config): boolean {
+  return !!config.garantia?.activa && config.garantia.importe > 0;
+}
 
 /** Mensaje entrante ya normalizado por index.ts (los audios llegan ya
  *  transcritos como texto, o como 'audioFallido' si Whisper no pudo) */
@@ -205,6 +213,10 @@ async function manejarPayload(ctx: Ctx, conv: Conversacion, payload: string, tit
   if (payload.startsWith('rec_conf_')) return confirmarCliente(ctx, payload.slice('rec_conf_'.length));
   if (payload.startsWith('rec_cancel_')) return cancelarReserva(ctx, payload.slice('rec_cancel_'.length));
 
+  // Cancelación tardía aceptada tras el aviso de cobro (antes que res_cancelar_: mismo prefijo)
+  if (payload.startsWith('res_cancelar_ok_')) {
+    return cancelarReserva(ctx, payload.slice('res_cancelar_ok_'.length), true);
+  }
   if (payload.startsWith('res_cancelar_')) {
     return cancelarReserva(ctx, payload.slice('res_cancelar_'.length));
   }
@@ -591,6 +603,7 @@ async function pedirNotas(ctx: Ctx, borrador: Borrador): Promise<void> {
 }
 
 async function pedirConfirmacion(ctx: Ctx, borrador: Borrador): Promise<void> {
+  const conGarantia = pideGarantia(ctx.config) && !(await esReincidente(ctx));
   await guardarConv(ctx, 'CONFIRMAR', borrador);
   await enviarBotones(
     ctx.telefono,
@@ -600,6 +613,10 @@ async function pedirConfirmacion(ctx: Ctx, borrador: Borrador): Promise<void> {
       comensales: borrador.comensales!,
       nombre: borrador.nombre!,
       notas: borrador.notas || t(ctx.idioma, 'sinNotas'),
+      // Condiciones de la garantía ANTES de confirmar (grupo y reincidente no la llevan)
+      garantia: conGarantia
+        ? '\n\n' + t(ctx.idioma, 'garantiaCondiciones', { importe: ctx.config.garantia!.importe })
+        : '',
     }),
     [
       { id: 'conf_si', titulo: t(ctx.idioma, 'btnConfSi') },
@@ -627,13 +644,25 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
   }
 
   // Reincidente (noshows >= 2): la reserva nace pendiente CON mesa y sala decide
-  const clienteSnap = await ctx.db.doc(`clientes/${ctx.telefono}`).get();
-  const reincidente = ((clienteSnap.data() as Cliente | undefined)?.noshows ?? 0) >= 2;
+  const reincidente = await esReincidente(ctx);
   const hoy = ahoraMadrid().fecha;
 
   const mesas = await cargarMesas(ctx.db); // las mesas cambian poco: fuera de la transacción
   const reservaRef = ctx.db.collection('reservas').doc();
   let mesaIds: string[] = [];
+
+  // Garantía: el enlace de retención se crea ANTES de la transacción (red). Si la
+  // reserva no cuaja, el enlace caduca solo. Si Teya falla → reserva normal (nunca
+  // se pierde una reserva por el proveedor de pagos).
+  let garantia: Garantia | null = null;
+  if (pideGarantia(ctx.config) && !reincidente) {
+    const importe = ctx.config.garantia!.importe;
+    const caducaEn = new Date(Date.now() + MINUTOS_GARANTIA * 60_000);
+    const enlace = await crearRetencion({ reservaId: reservaRef.id, importe, idioma: ctx.idioma, caducaEn });
+    if (enlace) garantia = { estado: 'pedida', importe, ...enlace, caducaEn: Timestamp.fromDate(caducaEn) };
+    else console.warn(`[flujo] Sin garantía para ${reservaRef.id}: Teya no creó el enlace`);
+  }
+  const motivo = reincidente ? ('reincidente' as const) : garantia ? ('garantia' as const) : null;
 
   try {
     await ctx.db.runTransaction(async (tx) => {
@@ -660,8 +689,9 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
         telefono: ctx.telefono,
         email: borrador.email ?? '',
         mesaIds,
-        estado: reincidente ? 'pendiente' : 'confirmada',
-        ...(reincidente ? { motivoPendiente: 'reincidente' as const } : {}),
+        estado: motivo ? 'pendiente' : 'confirmada',
+        ...(motivo ? { motivoPendiente: motivo } : {}),
+        ...(garantia ? { garantia } : {}),
         origen: borrador.web ? 'web' : 'bot',
         idioma: ctx.idioma,
         notas: borrador.notas ?? '',
@@ -689,24 +719,24 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
   await actualizarCliente(ctx, nombre, borrador.email ?? '');
   await guardarConv(ctx, 'IDLE', {});
 
-  if (reincidente) {
-    // El cliente ve "te confirmamos enseguida"; sala decide en el panel
-    await enviarTexto(ctx.telefono, t(ctx.idioma, 'reservaPendienteCliente'));
-  } else {
+  if (garantia) {
+    // Enlace de retención; la confirmación (y la ficha a sala) llegan al completarla (garantia.ts)
     await enviarTexto(
       ctx.telefono,
-      t(ctx.idioma, 'reservaConfirmada', {
+      t(ctx.idioma, 'garantiaPedir', {
         fecha: formatearFecha(fecha, ctx.idioma),
         hora,
         comensales,
-        nombre: ctx.config.nombre,
+        importe: garantia.importe,
+        url: garantia.url,
+        minutos: MINUTOS_GARANTIA,
       })
     );
-    // Aviso de cortesía (mensaje aparte): la mesa se guarda cortesiaMin minutos
-    await enviarTexto(ctx.telefono, t(ctx.idioma, 'cortesiaAviso', { cortesia: ctx.config.cortesiaMin }));
-    // Pin de ubicación del restaurante
-    const u = ctx.config.ubicacion;
-    await enviarUbicacion(ctx.telefono, u.lat, u.lng, ctx.config.nombre, u.direccion);
+  } else if (reincidente) {
+    // El cliente ve "te confirmamos enseguida"; sala decide en el panel
+    await enviarTexto(ctx.telefono, t(ctx.idioma, 'reservaPendienteCliente'));
+  } else {
+    await enviarConfirmacionCliente(ctx.config, { telefono: ctx.telefono, idioma: ctx.idioma, fecha, hora, comensales });
   }
 
   // Aviso de menú especial (Nit del Foc y similares). Solo cenas: son eventos
@@ -717,7 +747,10 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
     if (texto) await enviarTexto(ctx.telefono, texto);
   }
 
-  // Aviso operativo a sala: SIEMPRE, en cada reserva (fuera de la franja también)
+  // Aviso operativo a sala en cada reserva (fuera de la franja también). Con
+  // garantía pedida, la ficha sale cuando se retiene (sin retención no hay reserva).
+  if (garantia) return;
+  const sinGarantia = pideGarantia(ctx.config) && !reincidente ? '⚠️ sin garantía (fallo Teya)' : '';
   await avisarSala(
     ctx,
     fichaReserva(reincidente ? '🟡 RESERVA PENDIENTE (reincidente)' : '✅ NUEVA RESERVA', {
@@ -726,9 +759,37 @@ async function crearReserva(ctx: Ctx, conv: Conversacion, borrador: Borrador): P
       comensales,
       nombre,
       telefono: ctx.telefono,
-      notas: borrador.notas ?? '',
+      notas: [borrador.notas, sinGarantia].filter(Boolean).join(' · '),
     })
   );
+}
+
+/** Mensajes al cliente al quedar confirmada: confirmación, cortesía y pin.
+ *  Lo usan el bot al reservar, garantia.ts al retenerse y el trigger del panel. */
+export async function enviarConfirmacionCliente(
+  config: Config,
+  r: Pick<Reserva, 'telefono' | 'idioma' | 'fecha' | 'hora' | 'comensales'>
+): Promise<void> {
+  await enviarTexto(
+    r.telefono,
+    t(r.idioma, 'reservaConfirmada', {
+      fecha: formatearFecha(r.fecha, r.idioma),
+      hora: r.hora,
+      comensales: r.comensales,
+      nombre: config.nombre,
+    })
+  );
+  // Aviso de cortesía (mensaje aparte): la mesa se guarda cortesiaMin minutos
+  await enviarTexto(r.telefono, t(r.idioma, 'cortesiaAviso', { cortesia: config.cortesiaMin }));
+  // Pin de ubicación del restaurante
+  const u = config.ubicacion;
+  await enviarUbicacion(r.telefono, u.lat, u.lng, config.nombre, u.direccion);
+}
+
+/** noshows >= 2 en clientes/{telefono} */
+async function esReincidente(ctx: Ctx): Promise<boolean> {
+  const snap = await ctx.db.doc(`clientes/${ctx.telefono}`).get();
+  return ((snap.data() as Cliente | undefined)?.noshows ?? 0) >= 2;
 }
 
 /** Reserva de grupo (> maxComensalesBot): pendiente SIN mesa; sala decide */
@@ -831,7 +892,8 @@ async function iniciarCancelacion(ctx: Ctx): Promise<void> {
   await enviarLista(ctx.telefono, t(ctx.idioma, 'cancelarCual'), t(ctx.idioma, 'btnVerReservas'), filas);
 }
 
-async function cancelarReserva(ctx: Ctx, reservaId: string): Promise<void> {
+/** `aceptaCobro`: el cliente ya vio el aviso de cancelación tardía y siguió adelante */
+async function cancelarReserva(ctx: Ctx, reservaId: string, aceptaCobro = false): Promise<void> {
   const ref = ctx.db.doc(`reservas/${reservaId}`);
   const snap = await ref.get();
   const reserva = snap.exists ? (snap.data() as Reserva) : null;
@@ -847,8 +909,34 @@ async function cancelarReserva(ctx: Ctx, reservaId: string): Promise<void> {
     return;
   }
 
-  // canceladaPor:'cliente' → el trigger del panel no vuelve a notificarle
-  await ref.update({ estado: 'cancelada', canceladaPor: 'cliente', actualizadoEn: FieldValue.serverTimestamp() });
+  // Garantía retenida y faltan < 24 h: la cancelación se cobra → avisar antes
+  const g = reserva.garantia;
+  const tardia = g?.estado === 'retenida' && minutosHasta(reserva.fecha, reserva.hora) < 24 * 60;
+  if (tardia && !aceptaCobro) {
+    await guardarConv(ctx, 'IDLE', {});
+    await enviarBotones(
+      ctx.telefono,
+      t(ctx.idioma, 'cancelarTardeAviso', {
+        fecha: formatearFecha(reserva.fecha, ctx.idioma),
+        hora: reserva.hora,
+        importe: g!.importe,
+      }),
+      [
+        { id: `res_cancelar_ok_${reservaId}`, titulo: t(ctx.idioma, 'btnCancelarIgual') },
+        { id: 'menu_volver', titulo: t(ctx.idioma, 'btnMantener') },
+      ]
+    );
+    return;
+  }
+
+  // canceladaPor:'cliente' → el trigger del panel no vuelve a notificarle.
+  // cancelacionTardia → el trigger cobra la garantía en vez de liberarla.
+  await ref.update({
+    estado: 'cancelada',
+    canceladaPor: 'cliente',
+    ...(tardia ? { cancelacionTardia: true } : {}),
+    actualizadoEn: FieldValue.serverTimestamp(),
+  });
   await guardarConv(ctx, 'IDLE', {});
   await enviarTexto(
     ctx.telefono,

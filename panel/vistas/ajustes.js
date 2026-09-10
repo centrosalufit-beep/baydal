@@ -52,6 +52,13 @@ export function montarAjustes(cont) {
         <label>Latitud <input type="number" name="ubicacionLat" step="any"><small>Pin que se envía al confirmar</small></label>
         <label>Longitud <input type="number" name="ubicacionLng" step="any"></label>
         <label class="ancho-total">Dirección <input type="text" name="ubicacionDireccion" placeholder="Av. del Puerto 1, Calpe"></label>
+        <label class="etiqueta-check ancho-total">
+          <input type="checkbox" name="garantiaActiva"> Pedir garantía con tarjeta (retención Teya) en las reservas del bot
+        </label>
+        <label>Importe de la garantía (€)
+          <input type="number" name="garantiaImporte" min="1" step="1">
+          <small>Por reserva. Solo se cobra si no vienen sin avisar con 24 h (docs/GARANTIA.md)</small>
+        </label>
         <label class="ancho-total">Información práctica
           <textarea name="infoPractica" rows="8" placeholder="Parking: … Perros: … Tronas: … Acceso silla de ruedas: …"></textarea>
           <small>Esto es lo ÚNICO que Paco sabe de parking, perros, tronas, accesos… Escríbelo todo aquí; lo que no esté, el bot lo escala a un humano.</small>
@@ -83,6 +90,8 @@ export function montarAjustes(cont) {
     form.ubicacionLng.value = datos.ubicacion?.lng ?? '';
     form.ubicacionDireccion.value = datos.ubicacion?.direccion ?? '';
     form.infoPractica.value = datos.infoPractica ?? '';
+    form.garantiaActiva.checked = !!datos.garantia?.activa;
+    form.garantiaImporte.value = datos.garantia?.importe ?? 20;
     pintado = true;
   });
 
@@ -106,6 +115,7 @@ export function montarAjustes(cont) {
       direccion: form.ubicacionDireccion.value.trim(),
     };
     datos.infoPractica = form.infoPractica.value.trim();
+    datos.garantia = { activa: form.garantiaActiva.checked, importe: Number(form.garantiaImporte.value) || 0 };
     await updateDoc(ref, datos);
     sucio = false;
     aviso.hidden = true;

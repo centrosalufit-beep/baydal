@@ -53,6 +53,7 @@ Este documento es el **contrato único** entre módulos. Cualquier cambio de mod
   avisosPorFecha?: {         // OPCIONAL — menús especiales (Nit del Foc, Nochevieja…)
     [fecha: string]: { es, va, en, de, fr }  // clave YYYY-MM-DD
   },
+  garantia?: { activa: boolean, importe: number },  // OPCIONAL — retención Teya por reserva (EUR); ver "Garantía"
 }
 ```
 `avisosPorFecha`: al confirmar una reserva de **cena** en esa fecha, Paco manda
@@ -96,7 +97,14 @@ Vive en config —y no en el código— para poder ponerlo y quitarlo sin desple
   email: string,            // '' si no lo dio (paso opcional)
   mesaIds: string[],        // 1–3 mesas; [] en pendientes de grupo (las asigna sala)
   estado: 'pendiente' | 'confirmada' | 'cancelada' | 'noshow' | 'completada',
-  motivoPendiente?: 'grupo' | 'reincidente',  // solo si estado inicial fue pendiente
+  motivoPendiente?: 'grupo' | 'reincidente' | 'garantia',  // solo si estado inicial fue pendiente
+  garantia?: {                    // solo si se pidió retención al reservar (ver "Garantía")
+    estado: 'pedida' | 'retenida' | 'cobrando' | 'cobrada' | 'liberada' | 'caducada',
+    importe: number, enlaceId: string, url: string, caducaEn: Timestamp, transaccionId?: string,
+    alertaSala?: boolean,         // Teya sin responder 1 h después del plazo: sala avisada una vez
+  },
+  canceladaPor?: 'cliente' | 'sistema', // bot/sistema: el trigger no vuelve a notificar
+  cancelacionTardia?: boolean,    // canceló con garantía retenida y < 24 h → se cobra
   origen: 'bot' | 'panel' | 'web',
   idioma: 'es' | 'va' | 'en' | 'de' | 'fr',
   notas: string,
@@ -203,6 +211,28 @@ Webhook POST → firma HMAC → idempotencia `messageId` → procesar → 200 al
    - a falta de ≤2 h y sigue sin confirmar → `cancelada` + plantilla `reserva_liberada` + aviso a sala.
    - Reservas sin recordatorio enviado (creadas tarde) NUNCA se liberan solas.
 
+## Garantía (retención en tarjeta con Teya) — docs/GARANTIA.md
+
+Con `config.garantia.activa`, las reservas del bot (no grupo, no reincidente) piden una
+retención de `importe` € con un enlace de **pre-autorización** de Teya (no cobra nada):
+1. CONFIRMAR ya muestra las condiciones. Al confirmar: enlace Teya (caduca en 30 min) → la
+   reserva nace `pendiente` `motivoPendiente:'garantia'` CON mesa → mensaje con el enlace.
+   Si Teya falla → reserva normal confirmada y la ficha a sala avisa "sin garantía".
+2. `revisarGarantiasProgramado` (cada 5 min) y `teyaWebhook` (al instante) consultan el enlace:
+   COMPLETED → `confirmada` + `garantia.estado:'retenida'` + confirmación, cortesía y pin al
+   cliente + ficha a sala; sin retener a los 30+2 min → `cancelada` (`sistema`) + aviso al cliente.
+3. Trigger al cambiar de estado una reserva con garantía retenida: `noshow` o cancelación del
+   cliente con < 24 h (`cancelacionTardia`, tras avisarle con botones `res_cancelar_ok_<id>` /
+   `menu_volver`) → **captura** + aviso a cliente y sala (si falla: ficha "COBRAR A MANO");
+   `completada` o cualquier otra cancelación → **anulación** (si falla, caduca sola ~7 días).
+   Si sale de `pendiente` con la garantía aún `pedida` (sala confirma/rechaza, el cliente
+   cancela), se consulta Teya: retenida y confirmada → `retenida`; retenida y cancelada →
+   anulación; sin retener → se caduca el enlace. El cobro se reclama en transacción
+   (`cobrando`) para que una reentrega del trigger no repita avisos.
+4. Con garantía retenida la mesa NO se libera en T-2h (si no viene, es no-show).
+Techo: la retención de tarjeta dura ~7 días (Visa); reservas a más de 6 días vista pueden
+llegar al no-show con la retención ya caducada → ficha "COBRAR A MANO" (no se podrá cobrar).
+
 ## Reseñas Google (palanca SEO)
 
 En el panel, cada reserva del día tiene botón **⭐ Pedir reseña** (solo mesas contentas, criterio del personal).
@@ -220,6 +250,8 @@ plantilla `pedir_resena`) y sella `resenaPedidaEn`. Nunca dos veces, nunca con `
 | `recordatorios` | scheduled 10:07 | europe-west1 | plantilla recordatorio + botones (ciclo arriba) |
 | `liberarNoConfirmadas` | scheduled cada 15 min | europe-west1 | aviso T-4h y liberación T-2h (ciclo arriba) |
 | `resumenDiario` | scheduled 09:31 | europe-west1 | a `whatsappHumano`: reservas de hoy por turno (nº y pax), cuántas sin confirmar, pendientes de decidir, y buzón nocturno (`avisosPendientes`, que vacía) |
+| `revisarGarantiasProgramado` | scheduled cada 5 min | europe-west1 | garantías pendientes: confirmar si Teya dice COMPLETED, liberar si caducó |
+| `teyaWebhook` | HTTP público | europe-southwest1 | aviso de Teya → misma revisión al instante (no se fía del cuerpo) |
 | `limpieza` | scheduled 03:11 | europe-west1 | `procesados`>7d; reservas pasadas confirmadas→`completada`; RGPD: `conversaciones` inactivas >6 meses y `reservas` >2 años se borran |
 
 ## Plantillas Meta a aprobar (es/va/en/de/fr — ver docs/ALTA_META.md)

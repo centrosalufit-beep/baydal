@@ -185,11 +185,11 @@ export const TEXTOS = {
 
   // ── Paso CONFIRMAR ───────────────────────────────────────────────
   confirmar: {
-    es: 'Repasamos tu reserva:\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} personas\n👤 {nombre}\n📝 {notas}\n\n¿Confirmamos?',
-    va: 'Repassem la teua reserva:\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} persones\n👤 {nombre}\n📝 {notas}\n\nConfirmem?',
-    en: 'Let’s review your booking:\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} people\n👤 {nombre}\n📝 {notas}\n\nShall we confirm?',
-    de: 'Ihre Reservierung im Überblick:\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} Personen\n👤 {nombre}\n📝 {notas}\n\nDürfen wir bestätigen?',
-    fr: 'Récapitulons votre réservation :\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} personnes\n👤 {nombre}\n📝 {notas}\n\nOn confirme ?',
+    es: 'Repasamos tu reserva:\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} personas\n👤 {nombre}\n📝 {notas}{garantia}\n\n¿Confirmamos?',
+    va: 'Repassem la teua reserva:\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} persones\n👤 {nombre}\n📝 {notas}{garantia}\n\nConfirmem?',
+    en: 'Let’s review your booking:\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} people\n👤 {nombre}\n📝 {notas}{garantia}\n\nShall we confirm?',
+    de: 'Ihre Reservierung im Überblick:\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} Personen\n👤 {nombre}\n📝 {notas}{garantia}\n\nDürfen wir bestätigen?',
+    fr: 'Récapitulons votre réservation :\n\n📅 {fecha}\n🕐 {hora}\n👥 {comensales} personnes\n👤 {nombre}\n📝 {notas}{garantia}\n\nOn confirme ?',
   },
   sinNotas: { es: 'Sin notas', va: 'Sense notes', en: 'No notes', de: 'Keine Hinweise', fr: 'Aucune remarque' },
   btnConfSi: { es: 'Sí, confirmar', va: 'Sí, confirmar', en: 'Yes, confirm', de: 'Ja, bestätigen', fr: 'Oui, confirmer' },
@@ -231,6 +231,46 @@ export const TEXTOS = {
     en: 'No problem, nothing was saved. Can I help you with anything else?',
     de: 'Kein Problem, es wurde nichts gespeichert. Kann ich sonst noch etwas für Sie tun?',
     fr: 'Pas de souci, rien n’a été enregistré. Puis-je vous aider pour autre chose ?',
+  },
+
+  // ── Garantía (retención Teya, docs/GARANTIA.md) ──────────────────
+  // Va dentro de "confirmar" vía {garantia}: el cliente acepta las condiciones ANTES de confirmar
+  garantiaCondiciones: {
+    es: '💳 Para cerrar la reserva te pediré una garantía: una retención de {importe} € en tu tarjeta. No se cobra nada; solo se cobraría si no vienes sin avisar con al menos 24 h de antelación.',
+    va: '💳 Per a tancar la reserva et demanaré una garantia: una retenció de {importe} € en la teua targeta. No es cobra res; només es cobraria si no véns sense avisar amb almenys 24 h d’antelació.',
+    en: '💳 To secure the booking I will ask you for a guarantee: a hold of €{importe} on your card. Nothing is charged; it would only be charged if you do not show up without letting us know at least 24 hours in advance.',
+    de: '💳 Zur Absicherung der Reservierung bitte ich Sie um eine Garantie: eine Vormerkung von {importe} € auf Ihrer Karte. Es wird nichts abgebucht; belastet wird nur, wenn Sie ohne Absage mindestens 24 Stunden vorher nicht erscheinen.',
+    fr: '💳 Pour valider la réservation, je vous demanderai une garantie : une empreinte de {importe} € sur votre carte. Rien n’est débité ; le montant ne serait prélevé que si vous ne venez pas sans nous prévenir au moins 24 h à l’avance.',
+  },
+  garantiaPedir: {
+    es: '¡Casi está! 💳 Para cerrar tu reserva del {fecha} a las {hora} ({comensales} personas), deja la garantía aquí:\n{url}\n\nEs una retención de {importe} € en tu tarjeta: no se cobra y se libera sola. Solo se cobraría si no vienes sin avisar con al menos 24 h de antelación.\n\nTienes {minutos} minutos; en cuanto la completes te confirmo la mesa ✅',
+    va: 'Quasi està! 💳 Per a tancar la teua reserva del {fecha} a les {hora} ({comensales} persones), deixa la garantia ací:\n{url}\n\nÉs una retenció de {importe} € en la teua targeta: no es cobra i s’allibera sola. Només es cobraria si no véns sense avisar amb almenys 24 h d’antelació.\n\nTens {minutos} minuts; quan la completes et confirme la taula ✅',
+    en: 'Almost done! 💳 To secure your booking on {fecha} at {hora} ({comensales} people), please leave the guarantee here:\n{url}\n\nIt is a hold of €{importe} on your card: nothing is charged and it is released automatically. It would only be charged if you do not show up without letting us know at least 24 hours in advance.\n\nYou have {minutos} minutes; as soon as it is done I will confirm your table ✅',
+    de: 'Fast geschafft! 💳 Um Ihre Reservierung am {fecha} um {hora} ({comensales} Personen) abzusichern, hinterlegen Sie bitte hier die Garantie:\n{url}\n\nEs ist eine Vormerkung von {importe} € auf Ihrer Karte: Es wird nichts abgebucht und sie wird automatisch freigegeben. Belastet wird nur, wenn Sie ohne Absage mindestens 24 Stunden vorher nicht erscheinen.\n\nSie haben {minutos} Minuten Zeit; sobald das erledigt ist, bestätige ich Ihren Tisch ✅',
+    fr: 'Presque fini ! 💳 Pour valider votre réservation du {fecha} à {hora} ({comensales} personnes), laissez la garantie ici :\n{url}\n\nC’est une empreinte de {importe} € sur votre carte : rien n’est débité et elle est libérée automatiquement. Le montant ne serait prélevé que si vous ne venez pas sans nous prévenir au moins 24 h à l’avance.\n\nVous avez {minutos} minutes ; dès que c’est fait, je vous confirme la table ✅',
+  },
+  garantiaCaducada: {
+    es: 'No me ha llegado la garantía a tiempo, así que he liberado la mesa del {fecha} a las {hora}. Si aún quieres venir, escríbeme y miramos hueco 🙂',
+    va: 'No m’ha arribat la garantia a temps, així que he alliberat la taula del {fecha} a les {hora}. Si encara vols vindre, escriu-me i mirem si hi ha lloc 🙂',
+    en: 'The guarantee did not come through in time, so I have released the table on {fecha} at {hora}. If you still want to come, message me and we will check availability 🙂',
+    de: 'Die Garantie ist nicht rechtzeitig eingegangen, daher habe ich den Tisch am {fecha} um {hora} freigegeben. Wenn Sie noch kommen möchten, schreiben Sie mir und wir prüfen die Verfügbarkeit 🙂',
+    fr: 'La garantie n’est pas arrivée à temps, j’ai donc libéré la table du {fecha} à {hora}. Si vous souhaitez toujours venir, écrivez-moi et nous vérifierons la disponibilité 🙂',
+  },
+  cancelarTardeAviso: {
+    es: '⚠️ Faltan menos de 24 h para tu reserva del {fecha} a las {hora}. Si la cancelas ahora, se cobrará la garantía de {importe} €. ¿Quieres cancelarla igualmente?',
+    va: '⚠️ Falten menys de 24 h per a la teua reserva del {fecha} a les {hora}. Si la cancel·les ara, es cobrarà la garantia de {importe} €. Vols cancel·lar-la igualment?',
+    en: '⚠️ Your booking on {fecha} at {hora} is less than 24 hours away. If you cancel now, the €{importe} guarantee will be charged. Do you still want to cancel?',
+    de: '⚠️ Bis zu Ihrer Reservierung am {fecha} um {hora} sind es weniger als 24 Stunden. Wenn Sie jetzt stornieren, wird die Garantie von {importe} € belastet. Möchten Sie trotzdem stornieren?',
+    fr: '⚠️ Votre réservation du {fecha} à {hora} a lieu dans moins de 24 h. Si vous annulez maintenant, la garantie de {importe} € sera prélevée. Voulez-vous tout de même annuler ?',
+  },
+  btnCancelarIgual: { es: 'Cancelar igualmente', va: 'Cancel·lar igualment', en: 'Cancel anyway', de: 'Trotzdem stornieren', fr: 'Annuler quand même' },
+  btnMantener: { es: 'Mantener reserva', va: 'Mantindre-la', en: 'Keep booking', de: 'Tisch behalten', fr: 'Garder ma table' },
+  garantiaCobrada: {
+    es: 'Según las condiciones de tu reserva del {fecha} a las {hora}, hemos cobrado la garantía de {importe} €. Si crees que es un error, llámanos al {telefono}.',
+    va: 'Segons les condicions de la teua reserva del {fecha} a les {hora}, hem cobrat la garantia de {importe} €. Si creus que és un error, telefona’ns al {telefono}.',
+    en: 'In line with the conditions of your booking on {fecha} at {hora}, the €{importe} guarantee has been charged. If you think this is a mistake, please call us at {telefono}.',
+    de: 'Gemäß den Bedingungen Ihrer Reservierung am {fecha} um {hora} haben wir die Garantie von {importe} € belastet. Falls Sie das für einen Fehler halten, rufen Sie uns bitte unter {telefono} an.',
+    fr: 'Conformément aux conditions de votre réservation du {fecha} à {hora}, la garantie de {importe} € a été prélevée. Si vous pensez qu’il s’agit d’une erreur, appelez-nous au {telefono}.',
   },
 
   // ── Límite de reservas activas por teléfono ──────────────────────

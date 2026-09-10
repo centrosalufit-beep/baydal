@@ -11,8 +11,10 @@ import { defineSecret } from 'firebase-functions/params';
 import { initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore, Timestamp, type Query } from 'firebase-admin/firestore';
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { enviarFichaSala, enviarPlantilla, enviarTexto, enviarUbicacion, inicializarWhatsApp } from './whatsapp';
-import { fichaReserva, formatearFecha, procesarMensaje, type MensajeEntrante } from './flujo';
+import { enviarFichaSala, enviarPlantilla, enviarTexto, inicializarWhatsApp } from './whatsapp';
+import { enviarConfirmacionCliente, fichaReserva, formatearFecha, procesarMensaje, type MensajeEntrante } from './flujo';
+import { inicializarTeya } from './teya';
+import { garantiaTrasCambio, revisarGarantias } from './garantia';
 import { transcribir } from './claude';
 import { manejarWpApi } from './wpapi';
 import { t } from './textos';
@@ -30,11 +32,15 @@ const WHATSAPP_PHONE_ID = defineSecret('WHATSAPP_PHONE_ID');
 const ANTHROPIC_API_KEY = defineSecret('ANTHROPIC_API_KEY');
 const OPENAI_API_KEY = defineSecret('OPENAI_API_KEY'); // Whisper (notas de voz)
 const WP_API_TOKEN = defineSecret('WP_API_TOKEN'); // API del plugin de WordPress
+const TEYA_CLIENT_ID = defineSecret('TEYA_CLIENT_ID'); // garantía de reserva (docs/GARANTIA.md)
+const TEYA_CLIENT_SECRET = defineSecret('TEYA_CLIENT_SECRET');
+const SECRETS_TEYA = [TEYA_CLIENT_ID, TEYA_CLIENT_SECRET];
+const initTeya = () => inicializarTeya(TEYA_CLIENT_ID.value(), TEYA_CLIENT_SECRET.value());
 
 // ── Webhook de WhatsApp ──────────────────────────────────────────────
 
 export const whatsappWebhook = onRequest(
-  { secrets: [WHATSAPP_TOKEN, WHATSAPP_APP_SECRET, WHATSAPP_VERIFY_TOKEN, WHATSAPP_PHONE_ID, ANTHROPIC_API_KEY, OPENAI_API_KEY] },
+  { secrets: [WHATSAPP_TOKEN, WHATSAPP_APP_SECRET, WHATSAPP_VERIFY_TOKEN, WHATSAPP_PHONE_ID, ANTHROPIC_API_KEY, OPENAI_API_KEY, ...SECRETS_TEYA] },
   async (req, res) => {
     // GET: verificación del webhook por Meta (hub.challenge)
     if (req.method === 'GET') {
@@ -64,6 +70,7 @@ export const whatsappWebhook = onRequest(
     // "en segundo plano" se congela (aprendido el 29/07: respuestas de Paco que
     // llegaban minutos tarde). Si Meta reintenta por tardar, procesados/ lo absorbe.
     inicializarWhatsApp(WHATSAPP_PHONE_ID.value(), WHATSAPP_TOKEN.value());
+    initTeya();
     try {
       await procesarEntrada(req.body);
     } catch (error) {
@@ -191,7 +198,7 @@ export const wpApi = onRequest({ invoker: 'public', secrets: [WP_API_TOKEN] }, a
 // ── Trigger: cambios en reservas (panel ↔ bot) ───────────────────────
 
 export const onReservaActualizada = onDocumentUpdated(
-  { document: 'reservas/{id}', secrets: [WHATSAPP_TOKEN, WHATSAPP_PHONE_ID] },
+  { document: 'reservas/{id}', secrets: [WHATSAPP_TOKEN, WHATSAPP_PHONE_ID, ...SECRETS_TEYA] },
   async (event) => {
     const antes = event.data?.before.data() as Reserva | undefined;
     const despues = event.data?.after.data() as Reserva | undefined;
@@ -199,6 +206,7 @@ export const onReservaActualizada = onDocumentUpdated(
 
     const db = getFirestore();
     inicializarWhatsApp(WHATSAPP_PHONE_ID.value(), WHATSAPP_TOKEN.value());
+    initTeya();
 
     // 1) Panel marca no-show → histórico del cliente (con noshows>=2 el bot
     //    creará sus próximas reservas como pendientes)
@@ -217,24 +225,21 @@ export const onReservaActualizada = onDocumentUpdated(
     const delBot = despues.origen === 'bot' || despues.origen === 'web';
     if (!delBot) return;
     const convSnap = await db.doc(`conversaciones/${despues.telefono}`).get();
-    if (convSnap.data()?.baja === true) return;
+    const baja = convSnap.data()?.baja === true;
     const config = (await db.doc('config/restaurante').get()).data() as Config | undefined;
     if (!config) return;
 
-    // 2) Sala confirma una pendiente (grupo o reincidente) → avisar al cliente
-    if (antes.estado === 'pendiente' && despues.estado === 'confirmada') {
-      await enviarTexto(
-        despues.telefono,
-        t(despues.idioma, 'reservaConfirmada', {
-          fecha: formatearFecha(despues.fecha, despues.idioma),
-          hora: despues.hora,
-          comensales: despues.comensales,
-          cortesia: config.cortesiaMin,
-          nombre: config.nombre,
-        })
-      );
-      const u = config.ubicacion;
-      await enviarUbicacion(despues.telefono, u.lat, u.lng, config.nombre, u.direccion);
+    // 1b) Garantía: cobrar (no-show / cancelación tardía) o liberar. Va antes del
+    //     corte por BAJA: el cobro no depende de poder escribirle.
+    if (despues.garantia) {
+      await garantiaTrasCambio(event.params.id, event.data!.after.ref, antes, despues, config, baja);
+    }
+    if (baja) return;
+
+    // 2) Sala confirma una pendiente (grupo o reincidente) → avisar al cliente.
+    //    Las confirmadas por garantía retenida ya se avisaron en garantia.ts.
+    if (antes.estado === 'pendiente' && despues.estado === 'confirmada' && despues.garantia?.estado !== 'retenida') {
+      await enviarConfirmacionCliente(config, despues);
     }
 
     // 3) Cancelación desde el panel de una reserva futura → avisar al cliente
@@ -348,6 +353,8 @@ export const liberarNoConfirmadas = onSchedule(
     for (const doc of snap.docs) {
       const r = doc.data() as Reserva;
       if (!r.recordatorioEnviado || r.confirmadaCliente) continue;
+      // Con garantía retenida la mesa no se libera: si no viene, es no-show y se cobra
+      if (r.garantia?.estado === 'retenida') continue;
       const faltanMin = aMinutos(r.hora) - aMinutos(ahora);
       // Hora de entrada ya pasada (p.ej. tras una caída del scheduler): eso ya
       // no es "liberar", es un posible no-show y lo decide el panel.
@@ -397,6 +404,40 @@ export const liberarNoConfirmadas = onSchedule(
         }
       }
     }
+  }
+);
+
+// ── Garantías pendientes: cada 5 min + webhook de Teya ───────────────
+// Confirma las reservas cuya retención ya se hizo y libera las caducadas.
+
+export const revisarGarantiasProgramado = onSchedule(
+  {
+    schedule: '*/5 * * * *',
+    timeZone: 'Europe/Madrid',
+    region: 'europe-west1',
+    secrets: [WHATSAPP_TOKEN, WHATSAPP_PHONE_ID, ...SECRETS_TEYA],
+  },
+  async () => {
+    inicializarWhatsApp(WHATSAPP_PHONE_ID.value(), WHATSAPP_TOKEN.value());
+    initTeya();
+    await revisarGarantias();
+  }
+);
+
+// El aviso de Teya solo DISPARA la revisión (que consulta a Teya): no se fía del
+// cuerpo, así que no hace falta validar firma. Confirmación al instante al pagar.
+// ponytail: sin límite de frecuencia; si alguien lo martillea, añadir un mínimo entre vueltas.
+export const teyaWebhook = onRequest(
+  { invoker: 'public', secrets: [WHATSAPP_TOKEN, WHATSAPP_PHONE_ID, ...SECRETS_TEYA] },
+  async (_req, res) => {
+    inicializarWhatsApp(WHATSAPP_PHONE_ID.value(), WHATSAPP_TOKEN.value());
+    initTeya();
+    try {
+      await revisarGarantias();
+    } catch (error) {
+      console.error('[teyaWebhook] Error revisando garantías:', error);
+    }
+    res.sendStatus(200);
   }
 );
 

@@ -43,6 +43,20 @@ export interface Config {
   // Nit del Foc, Nochevieja…). Clave YYYY-MM-DD. Vive en config para poder
   // ponerlo y quitarlo sin desplegar; ausente = no se avisa de nada.
   avisosPorFecha?: { [fecha: string]: TextoIdiomas };
+  // Garantía: retención en tarjeta (Teya) por reserva del bot. Ausente o
+  // activa:false = sin garantía. Ver docs/GARANTIA.md.
+  garantia?: { activa: boolean; importe: number }; // importe en EUR por reserva
+}
+
+/** Garantía de una reserva: retención en tarjeta vía Teya (docs/GARANTIA.md) */
+export interface Garantia {
+  estado: 'pedida' | 'retenida' | 'cobrando' | 'cobrada' | 'liberada' | 'caducada';
+  importe: number;          // EUR
+  enlaceId: string;
+  url: string;
+  caducaEn: Timestamp;      // si no se retiene antes, la reserva se libera
+  transaccionId?: string;   // lo pone revisarGarantias al completarse
+  alertaSala?: boolean;     // Teya no respondió pasado el plazo: sala ya avisada
 }
 
 /** festivos/{YYYY-MM-DD} — cierres puntuales */
@@ -84,7 +98,8 @@ export interface Reserva {
   email: string;            // '' si no lo dio (paso opcional)
   mesaIds: string[];        // 1–3 mesas; [] en pendientes de grupo
   estado: EstadoReserva;
-  motivoPendiente?: 'grupo' | 'reincidente'; // solo si el estado inicial fue pendiente
+  motivoPendiente?: 'grupo' | 'reincidente' | 'garantia'; // solo si el estado inicial fue pendiente
+  garantia?: Garantia;            // solo si se pidió retención al reservar
   origen: 'bot' | 'panel' | 'web';
   idioma: Idioma;
   notas: string;
@@ -96,6 +111,7 @@ export interface Reserva {
   // ponytail: fuera de SCHEMA — distingue cancelaciones del bot/sistema de las
   // del panel para que onReservaActualizada no notifique dos veces al cliente.
   canceladaPor?: 'cliente' | 'sistema';
+  cancelacionTardia?: boolean;    // el cliente canceló con garantía retenida y < 24 h → se cobra
   creadoEn: Timestamp;
   actualizadoEn: Timestamp;
 }

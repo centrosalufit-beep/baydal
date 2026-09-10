@@ -7,7 +7,21 @@ import { db, cfg, esc, hoyISO } from '../app.js';
 import { horasDisponibles, mesasLibres, asignarMesa } from '../disponibilidad.js';
 
 const TURNOS = ['comida', 'cena'];
-const MOTIVOS = { grupo: 'Grupo grande', reincidente: 'Cliente reincidente (no-shows)' };
+const MOTIVOS = {
+  grupo: 'Grupo grande',
+  reincidente: 'Cliente reincidente (no-shows)',
+  garantia: 'Esperando la garantía (tarjeta) — se libera sola si no llega',
+};
+// Garantía Teya (docs/GARANTIA.md): etiqueta por estado
+const GARANTIA = {
+  pedida: '💳 garantía pedida',
+  retenida: '💳 {i} € retenidos',
+  cobrando: '💳 cobrando {i} €…',
+  cobrada: '💳 {i} € COBRADOS',
+  liberada: '💳 retención liberada',
+  caducada: '💳 garantía no llegó',
+};
+const etiquetaGarantia = (g) => (g ? `<span class="badge-ok">${GARANTIA[g.estado]?.replace('{i}', g.importe) ?? ''}</span>` : '');
 
 export function montarAgenda(cont) {
   let fechaSel = hoyISO();
@@ -171,6 +185,7 @@ export function montarAgenda(cont) {
         <div class="reserva-datos">
           <strong>${esc(r.nombre)}</strong> · ${r.comensales} pax · Mesa ${esc(nombreMesas(r.mesaIds)) || '—'}
           ${r.confirmadaCliente ? '<span class="badge-ok">✓ confirmada por el cliente</span>' : ''}
+          ${etiquetaGarantia(r.garantia)}
           ${r.telefono ? `<br><a href="https://wa.me/${esc(r.telefono)}" target="_blank" rel="noopener">WhatsApp ${esc(r.telefono)}</a>` : ''}
           ${r.email ? `<br><span class="suave">${esc(r.email)}</span>` : ''}
           ${r.notas ? `<p class="notas">${esc(r.notas)}</p>` : ''}
@@ -213,6 +228,9 @@ export function montarAgenda(cont) {
     if (!boton) return;
     const estado = boton.dataset.estado;
     if (estado === 'cancelada' && !confirm('¿Cancelar esta reserva? La mesa quedará libre.')) return;
+    const g = reservas.find((x) => x.id === id)?.garantia;
+    if (estado === 'noshow' && g?.estado === 'retenida'
+      && !confirm(`No-show: se cobrarán los ${g.importe} € de la garantía y se avisará al cliente. ¿Seguro?`)) return;
     await updateDoc(doc(db, 'reservas', id), { estado, actualizadoEn: serverTimestamp() });
   });
 
