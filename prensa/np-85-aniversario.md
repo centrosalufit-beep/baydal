@@ -14,7 +14,7 @@ En los fogones de esa segunda generación nació el plato que ha dado fama a la 
 
 La casa celebra el aniversario con la renovación completa de su web —ahora en cuatro idiomas, con la historia de la familia y del senyoret documentada— y mantiene intacta su seña de identidad: el pescado de la subasta diaria de la lonja de Calp, a cincuenta metros de su cocina.
 
-**Sobre el Restaurante Baydal** · Fundado en julio de 1941 por Salvador y María Baydal. Tercera generación. Avinguda del Port, 10 — 03710 Calp (Alicante). Tel. 965 831 111 · info@baydal.es · baydal.es
+**Sobre el Restaurante Baydal** · Fundado en julio de 1941 por Salvador y María Baydal. Tercera generación. Avinguda del Port, 10 — 03710 Calp (Alicante). Tel. 965 831 111 · fjbaydal@gmail.com · baydal.es
 
 **Material gráfico disponible**: fotografía histórica del Bar Baydal (años 60, con el Peñón de Ifach), fotografías actuales de platos y fachada en alta resolución. Se facilitan bajo petición o en baydal.es/prensa.
 

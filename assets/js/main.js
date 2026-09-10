@@ -20,6 +20,53 @@ document.addEventListener("click", function (e) {
   b.replaceWith(f);
 });
 
+// Reservas: el momento del día (desayuno/almuerzo/comida/cena) sugiere las horas
+var HORAS = {
+  desayuno: ["8:00", "8:30", "9:00", "9:30", "10:00", "10:30", "11:00"],
+  almuerzo: ["11:30", "12:00", "12:30", "13:00"],
+  comida:   ["13:00", "13:30", "14:00", "14:30", "15:00", "15:30"],
+  cena:     ["19:30", "20:00", "20:30", "21:00", "21:30", "22:00"]
+};
+document.addEventListener("change", function (e) {
+  if (e.target.id !== "res-meal") return;
+  var sel = document.getElementById("res-hora");
+  sel.innerHTML = (HORAS[e.target.value] || [])
+    .map(function (h) { return '<option value="' + h + '">' + h + "</option>"; })
+    .join("");
+});
+
+// Quiz del senyoret: responder, dar feedback y funnel a reservar
+document.querySelectorAll(".quiz").forEach(function (quiz) {
+  var total = parseInt(quiz.dataset.total, 10) || 0;
+  var score = 0, answered = 0;
+  quiz.querySelectorAll(".quiz-q").forEach(function (q) {
+    var opts = q.querySelectorAll(".quiz-opt");
+    opts.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (q.classList.contains("done")) return;
+        q.classList.add("done");
+        var ok = btn.dataset.ok === "1";
+        btn.classList.add(ok ? "right" : "wrong");
+        if (ok) { score++; }
+        else {
+          var correct = q.querySelector('.quiz-opt[data-ok="1"]');
+          if (correct) { correct.classList.add("right"); }
+        }
+        opts.forEach(function (b) { b.disabled = true; });
+        var ex = q.querySelector(".quiz-explain");
+        if (ex) { ex.hidden = false; }
+        answered++;
+        if (answered === total) {
+          var res = quiz.querySelector(".quiz-result");
+          var n = quiz.querySelector(".quiz-score-n");
+          if (n) { n.textContent = score; }
+          if (res) { res.hidden = false; res.scrollIntoView({ block: "nearest" }); }
+        }
+      });
+    });
+  });
+});
+
 // Reserva por WhatsApp: construye el wa.me con el mensaje en el idioma de la página
 document.addEventListener("submit", function (e) {
   var f = e.target;

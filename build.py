@@ -8,6 +8,9 @@ import os, shutil, json
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(ROOT, "dist")
 DOMAIN = "https://baydal.es"
+# Hero de vídeo (dron del puerto de Calp). Fichero real en la biblioteca de WP (no payload):
+# el router deja pasar /wp-content y sirve con rangos, así que reproduce en todos los navegadores.
+HERO_VIDEO = "https://baydal.es/wp-content/uploads/2026/07/baydal-hero-calp-aereo.mp4"
 TEL = "+34965831111"
 TEL_VISIBLE = "965 831 111"
 WA = "34965831111"  # bot de reservas (Paco) — antes recepción 34677490049
@@ -60,7 +63,7 @@ T = {
  "home_platos_t":"De la casa","home_press_t":"Dicen de nosotros",
  "press_quote":"«En el Restaurante Baydal de Calpe se inventó el famoso arròs del senyoret.»","press_src":"Costa Nachrichten (prensa alemana de la Costa Blanca)",
  "home_visit_t":"Estamos en el puerto",
- "hours_t":"Horario","hours":"10:00–16:00 y 19:00–23:00 · Lunes cerrado (salvo verano)",
+ "hours_t":"Horario","hours":"Lunes a jueves 8:00–16:30<br>Viernes 8:00–16:30 · 19:30–22:30<br>Sábado 7:30–16:30 · 19:30–22:30<br>Domingo 7:30–16:30",
  "addr_t":"Dirección","map_cta":"Cómo llegar",
  "meta_carta":("Carta 2026 | Restaurante Baydal, arroces y marisco en Calp","Carta completa con precios: arroces y paellas, pescado fresco de la lonja de Calp, marisco de la bahía, carnes y menú Baydal a 30 €. Restaurante en el puerto de Calpe."),
  "carta_h1":"La carta","carta_sub":"Producto de la lonja de Calp y arroces hechos al momento. Precios con IVA. Si tienes alergias o intolerancias, dínoslo: tenemos pan sin gluten y te asesoramos plato a plato.",
@@ -126,7 +129,7 @@ T = {
  "home_platos_t":"House classics","home_press_t":"In the press",
  "press_quote":"“The famous arròs del senyoret was invented at Restaurante Baydal in Calpe.”","press_src":"Costa Nachrichten (German-language Costa Blanca press)",
  "home_visit_t":"On the harbour",
- "hours_t":"Opening hours","hours":"10:00–16:00 & 19:00–23:00 · Closed Mondays (except summer)",
+ "hours_t":"Opening hours","hours":"Monday–Thursday 8:00–16:30<br>Friday 8:00–16:30 · 19:30–22:30<br>Saturday 7:30–16:30 · 19:30–22:30<br>Sunday 7:30–16:30",
  "addr_t":"Address","map_cta":"Get directions",
  "meta_carta":("Menu 2026 | Restaurante Baydal — paella & seafood in Calpe","Full menu with prices: paellas and rice dishes, fresh fish from Calpe's auction, shellfish, meat and the 30 € Baydal set menu. Restaurant on Calpe harbour."),
  "carta_h1":"The menu","carta_sub":"Produce from Calpe's fish market and rice made to order. Prices include VAT. Allergies or intolerances? Tell us — gluten-free bread available, and we'll guide you dish by dish.",
@@ -192,7 +195,7 @@ T = {
  "home_platos_t":"Klassiker des Hauses","home_press_t":"Pressestimmen",
  "press_quote":"„Im Restaurant Baydal in Calpe wurde das berühmte Reisgericht Arroz del Senyoret erfunden.“","press_src":"Costa Nachrichten",
  "home_visit_t":"Am Hafen",
- "hours_t":"Öffnungszeiten","hours":"10:00–16:00 & 19:00–23:00 · Montags geschlossen (außer im Sommer)",
+ "hours_t":"Öffnungszeiten","hours":"Montag–Donnerstag 8:00–16:30<br>Freitag 8:00–16:30 · 19:30–22:30<br>Samstag 7:30–16:30 · 19:30–22:30<br>Sonntag 7:30–16:30",
  "addr_t":"Adresse","map_cta":"Route anzeigen",
  "meta_carta":("Speisekarte 2026 | Restaurante Baydal — Paella & Meeresfrüchte in Calpe","Komplette Karte mit Preisen: Paellas und Reisgerichte, frischer Fisch von der Auktion in Calpe, Meeresfrüchte, Fleisch und Baydal-Menü für 30 €. Restaurant am Hafen von Calpe."),
  "carta_h1":"Die Speisekarte","carta_sub":"Produkte von der Lonja in Calpe, Reisgerichte frisch zubereitet. Preise inkl. MwSt. Allergien oder Unverträglichkeiten? Sagen Sie es uns — glutenfreies Brot vorhanden, wir beraten Sie gern.",
@@ -258,7 +261,7 @@ T = {
  "home_platos_t":"Les classiques de la maison","home_press_t":"Ils en parlent",
  "press_quote":"« C'est au Restaurante Baydal de Calpe qu'a été inventé le fameux arròs del senyoret. »","press_src":"Costa Nachrichten (presse de la Costa Blanca)",
  "home_visit_t":"Sur le port",
- "hours_t":"Horaires","hours":"10 h – 16 h & 19 h – 23 h · Fermé le lundi (sauf en été)",
+ "hours_t":"Horaires","hours":"Lundi–jeudi 8 h – 16 h 30<br>Vendredi 8 h – 16 h 30 · 19 h 30 – 22 h 30<br>Samedi 7 h 30 – 16 h 30 · 19 h 30 – 22 h 30<br>Dimanche 7 h 30 – 16 h 30",
  "addr_t":"Adresse","map_cta":"Itinéraire",
  "meta_carta":("Carte 2026 | Restaurante Baydal — paella & fruits de mer à Calpe","Carte complète avec prix : paellas et riz, poisson frais de la criée de Calpe, fruits de mer, viandes et menu Baydal à 30 €. Restaurant sur le port de Calpe."),
  "carta_h1":"La carte","carta_sub":"Produits de la criée de Calpe, riz préparés minute. Prix TTC. Allergies ou intolérances ? Dites-le-nous : pain sans gluten disponible, et nous vous conseillons plat par plat.",
@@ -394,6 +397,11 @@ GALLERY = [
  ("croquetas-pase","Croquetas caseras en el pase de cocina","Homemade croquettes at the kitchen pass","Hausgemachte Kroketten am Küchenpass","Croquettes maison au passe"),
  ("flan-casero","Flan de huevo casero con helado","Homemade crème caramel with ice cream","Hausgemachter Flan mit Eis","Flan maison avec glace"),
  ("helado-turron","Helado de turrón con Pedro Ximénez","Turrón ice cream with Pedro Ximénez","Turrón-Eis mit Pedro Ximénez","Glace au turrón et Pedro Ximénez"),
+ ("emperador-plancha","Emperador fresco a la plancha con patatas","Grilled fresh swordfish with fries","Gegrillter Schwertfisch mit Pommes","Espadon frais grillé avec frites"),
+ ("calamares-baydal","Calamar a la romana estilo Baydal","Baydal-style fried calamari","Tintenfischringe nach Baydal-Art","Calmars à la romaine façon Baydal"),
+ ("boquerones-fritos","Boquerones fritos de la bahía","Fried fresh anchovies from the bay","Frittierte Sardellen aus der Bucht","Anchois frits de la baie"),
+ ("croquetas-pulpo","Croqueta de pulpo estilo Baydal","Baydal octopus croquette","Oktopus-Krokette nach Baydal-Art","Croquette de poulpe façon Baydal"),
+ ("chopitos","Chopitos fritos, puntillas de la lonja","Fried baby cuttlefish from the market","Frittierte Baby-Tintenfische von der Lonja","Petits encornets frits de la criée"),
  ("fachada-baydal","Fachada del Restaurante Baydal en el puerto de Calp","Baydal façade on Calpe harbour","Baydal-Fassade am Hafen von Calpe","Façade du Baydal sur le port"),
  ("calpe-penon-panoramica","Calp y el Peñón de Ifach desde el aire","Calpe and the Peñón de Ifach from above","Calpe und der Peñón de Ifach von oben","Calpe et le Peñón de Ifach vus du ciel"),
  ("historia-bar-baydal","El Bar Baydal en los años 60, con el Peñón detrás","Bar Baydal in the 1960s, the Peñón behind","Die Bar Baydal in den 60ern, dahinter der Peñón","Le Bar Baydal dans les années 60, le Peñón derrière"),
@@ -518,6 +526,138 @@ EXTRA = {
 }
 
 
+# --- Reseñas destacadas -----------------------------------------------------
+# Se rellenan desde la fuente que elija David (Google Business / Places API, o
+# una selección propia). REVIEWS vacío ⇒ la sección NO se renderiza y la web
+# queda idéntica. Forma de cada reseña:
+#   {"autor": str, "estrellas": 1..5, "texto": str, "fecha": "jun 2026", "url": "https://…"}
+# Nota: al ser reseñas de Google se muestran con atribución y enlace, pero NO se
+# marcan como Review/aggregateRating en JSON-LD (la política de datos estructurados
+# de Google prohíbe auto-servir reseñas de terceros).
+GOOGLE_URL = "https://www.google.com/maps/search/?api=1&query=Restaurante+Baydal+Calp"
+RATING = None      # (nota, nº) p.ej. (4.0, 1603) para mostrar la línea resumen; None ⇒ solo "Ver todas"
+# Selección de reseñas 5★ de Google (capturas de David, 16/07/2026). Texto fiel, recortado
+# a tamaño tarjeta. Sin URL por reseña ⇒ el enlace "Ver todas" del encabezado va a Google.
+REVIEWS = [
+ {"autor":"Píespaquéosquiero","meta":"Local Guide · 801 reseñas","color":"#8E24AA","estrellas":5,"fecha":"jun 2026",
+  "texto":"El personal tiene un trato exquisito, desde el dueño hasta la cocinera: todos súper amables y serviciales. La comida está muy buena y es abundante, el menú de 30 € está genial y sales muy satisfecho. Muy recomendable, volvería sin dudarlo."},
+ {"autor":"Mar Castellón","meta":"2 reseñas","color":"#00897B","estrellas":5,"fecha":"feb 2026",
+  "texto":"Me ha encantado el sitio. Era la primera vez y el menú estaba muy rico. El arroz, delicioso, y el ambiente muy bueno. Muy recomendable."},
+ {"autor":"Jesús Valverde","meta":"Local Guide · 310 reseñas","color":"#1E88E5","estrellas":5,"fecha":"oct 2025",
+  "texto":"Muy buen sitio para comer, excelente trato y atención, y muy buena calidad y cantidad. El menú de 30 € con ensalada, fritura de pescado y arròs del senyoret, bebida y postre: el arroz en su punto y con muy buen sabor."},
+ {"autor":"Diego","meta":"Local Guide · 100 reseñas","color":"#43A047","estrellas":5,"fecha":"sep 2025",
+  "texto":"Siempre que voy a Calpe elijo este restaurante para comer. Buenas paellas, buen trato y se está muy a gusto. Llevo más de 20 años yendo. Espero me sigan tratando tan bien."},
+ {"autor":"M. Z.","meta":"Local Guide · 21 reseñas","color":"#E8710A","estrellas":5,"fecha":"jul 2025",
+  "texto":"Espectacular como siempre. Después de la playa no se puede estar más fresquito. Si quieres comer bien y relajado, este es el sitio. Todo buenísimo y pescado fresco, el servicio atento y rápido."},
+]
+
+RES = {
+ "es": {"kick":"Reseñas","title":"Lo que dicen los clientes","ver":"Ver en Google","todas":"Ver todas en Google","nota":"{r} en Google · {n} reseñas"},
+ "en": {"kick":"Reviews","title":"What our guests say","ver":"View on Google","todas":"See all reviews on Google","nota":"{r} on Google · {n} reviews"},
+ "de": {"kick":"Bewertungen","title":"Was unsere Gäste sagen","ver":"Auf Google ansehen","todas":"Alle Bewertungen auf Google","nota":"{r} auf Google · {n} Bewertungen"},
+ "fr": {"kick":"Avis","title":"Ce que disent nos clients","ver":"Voir sur Google","todas":"Voir tous les avis sur Google","nota":"{r} sur Google · {n} avis"},
+}
+
+# Reserva: el momento del día sugiere las horas (los horarios reales viven en main.js)
+MEALS = {
+ "es": {"label":"Momento del día","ph":"Elige…","opts":[("desayuno","Desayuno"),("almuerzo","Almuerzo"),("comida","Comida"),("cena","Cena")]},
+ "en": {"label":"Time of day","ph":"Choose…","opts":[("desayuno","Breakfast"),("almuerzo","Brunch"),("comida","Lunch"),("cena","Dinner")]},
+ "de": {"label":"Tageszeit","ph":"Wählen…","opts":[("desayuno","Frühstück"),("almuerzo","Vormittag"),("comida","Mittagessen"),("cena","Abendessen")]},
+ "fr": {"label":"Moment de la journée","ph":"Choisir…","opts":[("desayuno","Petit-déjeuner"),("almuerzo","Brunch"),("comida","Déjeuner"),("cena","Dîner")]},
+}
+
+# --- Quiz del senyoret (página del senyoret) ---------------------------------
+# Educativo y a prueba de balas: solo hechos verificados y con fuente. NO se pregunta
+# por la década (fuentes discrepan). El orden de opciones es idéntico en los 4 idiomas
+# para que 'ok' (índice de la correcta) coincida. Cierra funelando a Reservar.
+QUIZ = {
+ "es": {"kick":"Pon a prueba tu paladar","title":"¿Cuánto sabes del arròs del senyoret?",
+  "intro":"Cinco preguntas rápidas. Al final, la clase práctica.",
+  "done":"Has acertado","of":"de","good":"Aprobado con nota. Ya sabes del senyoret más que la mayoría.",
+  "cta_t":"Ahora, la clase práctica","cta_p":"Ven a probar el original donde nació, en el puerto de Calp.","cta":"Reservar mesa",
+  "qs":[
+   {"q":"Según À Punt, Las Provincias y la Viquipèdia, ¿dónde nació el arròs del senyoret?","ok":1,
+    "a":["En una arrocería de Valencia","En el Baydal, en el puerto de Calp","En Gandía","En Alicante"],
+    "e":"À Punt, Las Provincias, Levante-EMV y la Viquipèdia señalan a esta casa del puerto de Calp, desde 1941, como donde se creó."},
+   {"q":"¿Qué distingue al senyoret de otros arroces de marisco?","ok":0,
+    "a":["El marisco va pelado y limpio","Lleva el doble de azafrán","Se cocina sin caldo","Se sirve siempre para una persona"],
+    "e":"Todo el pescado y el marisco van pelados: se come con cuchara y tenedor, sin mancharse los dedos. De ahí el nombre."},
+   {"q":"¿De dónde viene el nombre «del senyoret»?","ok":2,
+    "a":["De un cocinero apodado así","De una calle de Calp","De un cliente que no quería pelarse las gambas","De una barca de la lonja"],
+    "e":"Un cliente valenciano lo pedía con todo pelado para no mancharse; en la cocina lo apodaron «el senyoret», el señorito. El nombre se quedó."},
+   {"q":"¿Sobre qué base se levanta el original?","ok":3,
+    "a":["Sofrito de tomate y pollo","Caldo de verduras","Nata y azafrán","Fumet de morralla, salmorreta y marisco de la bahía"],
+    "e":"Fumet de morralla, salmorreta alicantina y marisco de la bahía de Calp, de la lonja que está a 50 metros."},
+   {"q":"¿Cuándo declaró Calp el arròs del senyoret plato típico?","ok":1,
+    "a":["En los años 40","A mediados de los años 90","En 2016","En 2021"],
+    "e":"A mediados de los noventa, el Ajuntament de Calp lo declaró plato típico del municipio."},
+  ]},
+ "en": {"kick":"Test your palate","title":"How well do you know arròs del senyoret?",
+  "intro":"Five quick questions. Then the practical class.",
+  "done":"You got","of":"of","good":"Top marks! You now know more about the senyoret than most.",
+  "cta_t":"Now, the practical class","cta_p":"Come and taste the original where it was born, on Calpe harbour.","cta":"Book a table",
+  "qs":[
+   {"q":"According to À Punt, Las Provincias and Wikipedia, where was arròs del senyoret born?","ok":1,
+    "a":["In a Valencia rice house","At Baydal, on Calpe harbour","In Gandía","In Alicante"],
+    "e":"À Punt, the newspapers Las Provincias and Levante-EMV and Wikipedia all point to this house on Calpe harbour, open since 1941, as where it was created."},
+   {"q":"What sets the senyoret apart from other seafood rices?","ok":0,
+    "a":["All the seafood comes peeled and cleaned","Twice the saffron","It's cooked without stock","It's always for one"],
+    "e":"Every bit of fish and shellfish comes peeled — you eat it all with knife and fork, no messy fingers. That's where the name comes from."},
+   {"q":"Where does the name «del senyoret» come from?","ok":2,
+    "a":["From a chef with that nickname","From a street in Calpe","From a customer who didn't want to peel his prawns","From a fishing boat"],
+    "e":"A Valencian regular asked for his rice with everything peeled so as not to dirty his fingers; the kitchen nicknamed him «el senyoret» — the young gentleman. The name stuck."},
+   {"q":"What is the original built on?","ok":3,
+    "a":["Tomato and chicken sofrito","Vegetable broth","Cream and saffron","Rockfish stock, salmorreta and shellfish from the bay"],
+    "e":"Rockfish fumet, Alicante-style salmorreta and shellfish from the bay of Calpe, straight from the fish market 50 metres away."},
+   {"q":"When did Calpe declare arròs del senyoret its signature dish?","ok":1,
+    "a":["In the 1940s","In the mid-1990s","In 2016","In 2021"],
+    "e":"In the mid-nineties, Calpe Town Hall declared it the town's typical dish."},
+  ]},
+ "de": {"kick":"Teste deinen Gaumen","title":"Wie gut kennst du den Arròs del Senyoret?",
+  "intro":"Fünf schnelle Fragen. Danach die Praxisstunde.",
+  "done":"Du hast","of":"von","good":"Bestanden mit Auszeichnung! Du weißt jetzt mehr über den Senyoret als die meisten.",
+  "cta_t":"Jetzt die Praxisstunde","cta_p":"Probiere das Original dort, wo es geboren wurde — am Hafen von Calpe.","cta":"Tisch reservieren",
+  "qs":[
+   {"q":"Laut À Punt, Las Provincias und Wikipedia — wo wurde der Arròs del Senyoret geboren?","ok":1,
+    "a":["In einer Reisküche in Valencia","Im Baydal, am Hafen von Calpe","In Gandía","In Alicante"],
+    "e":"À Punt, die Zeitungen Las Provincias und Levante-EMV sowie Wikipedia nennen dieses Haus am Hafen von Calpe (seit 1941) als Geburtsort."},
+   {"q":"Was unterscheidet den Senyoret von anderen Meeresfrüchte-Reisgerichten?","ok":0,
+    "a":["Alle Meeresfrüchte sind geschält und geputzt","Doppelt so viel Safran","Er wird ohne Fond gekocht","Immer nur für eine Person"],
+    "e":"Fisch und Meeresfrüchte sind komplett geschält — man isst alles mit Messer und Gabel, ohne sich die Finger schmutzig zu machen. Daher der Name."},
+   {"q":"Woher kommt der Name «del Senyoret»?","ok":2,
+    "a":["Von einem Koch mit diesem Spitznamen","Von einer Straße in Calpe","Von einem Gast, der keine Garnelen schälen wollte","Von einem Fischerboot"],
+    "e":"Ein valencianischer Stammgast bestellte seinen Reis komplett geschält, um sich nicht die Finger schmutzig zu machen; in der Küche nannte man ihn «el senyoret», das Herrchen. Der Name blieb."},
+   {"q":"Worauf baut das Original auf?","ok":3,
+    "a":["Tomaten-Hähnchen-Sofrito","Gemüsebrühe","Sahne und Safran","Fischfond, Salmorreta und Meeresfrüchte aus der Bucht"],
+    "e":"Fischfond von Felsenfischen, Salmorreta nach Alicante-Art und Meeresfrüchte aus der Bucht von Calpe, von der Fischauktion 50 Meter entfernt."},
+   {"q":"Wann erklärte Calpe den Arròs del Senyoret zum typischen Gericht?","ok":1,
+    "a":["In den 1940ern","Mitte der 1990er","2016","2021"],
+    "e":"Mitte der neunziger Jahre erklärte die Stadt Calpe ihn zum typischen Gericht des Ortes."},
+  ]},
+ "fr": {"kick":"Mets ton palais à l'épreuve","title":"Connaissez-vous l'arròs del senyoret ?",
+  "intro":"Cinq questions rapides. Ensuite, les travaux pratiques.",
+  "done":"Vous avez","of":"sur","good":"Mention très bien ! Vous en savez désormais plus que la plupart sur le senyoret.",
+  "cta_t":"Maintenant, les travaux pratiques","cta_p":"Venez goûter l'original là où il est né, sur le port de Calpe.","cta":"Réserver une table",
+  "qs":[
+   {"q":"Selon À Punt, Las Provincias et Wikipédia, où est né l'arròs del senyoret ?","ok":1,
+    "a":["Dans un restaurant de riz à Valence","Au Baydal, sur le port de Calpe","À Gandía","À Alicante"],
+    "e":"À Punt, les journaux Las Provincias et Levante-EMV et Wikipédia désignent cette maison du port de Calpe, ouverte depuis 1941, comme son berceau."},
+   {"q":"Qu'est-ce qui distingue le senyoret des autres riz de fruits de mer ?","ok":0,
+    "a":["Tous les fruits de mer sont décortiqués et nettoyés","Deux fois plus de safran","Il est cuit sans bouillon","Toujours pour une personne"],
+    "e":"Poissons et fruits de mer sont entièrement décortiqués : on mange tout à la fourchette, sans se salir les doigts. D'où le nom."},
+   {"q":"D'où vient le nom « del senyoret » ?","ok":2,
+    "a":["D'un cuisinier surnommé ainsi","D'une rue de Calpe","D'un client qui ne voulait pas décortiquer ses gambas","D'un bateau de la criée"],
+    "e":"Un habitué valencien demandait son riz entièrement décortiqué pour ne pas se salir les doigts ; en cuisine on l'a surnommé « el senyoret », le petit monsieur. Le nom est resté."},
+   {"q":"Sur quelle base repose l'original ?","ok":3,
+    "a":["Sofrito de tomate et poulet","Bouillon de légumes","Crème et safran","Fumet de poissons de roche, salmorreta et fruits de mer de la baie"],
+    "e":"Fumet de poissons de roche, salmorreta d'Alicante et fruits de mer de la baie de Calpe, de la criée située à 50 mètres."},
+   {"q":"Quand Calpe a-t-elle déclaré l'arròs del senyoret plat typique ?","ok":1,
+    "a":["Dans les années 40","Au milieu des années 90","En 2016","En 2021"],
+    "e":"Au milieu des années quatre-vingt-dix, la mairie de Calpe l'a déclaré plat typique de la commune."},
+  ]},
+}
+
+
 def u(page, lang):
     return PATHS[page][lang]
 
@@ -536,8 +676,9 @@ def schema_restaurant(lang):
       "address":{"@type":"PostalAddress","streetAddress":ADDRESS,"addressLocality":"Calp","addressRegion":"Alicante","postalCode":"03710","addressCountry":"ES"},
       "geo":{"@type":"GeoCoordinates","latitude":GEO[0],"longitude":GEO[1]},
       "openingHoursSpecification":[
-        {"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"10:00","closes":"16:00"},
-        {"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"19:00","closes":"23:00"}],
+        {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"08:00","closes":"16:30"},
+        {"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"07:30","closes":"16:30"},
+        {"@type":"OpeningHoursSpecification","dayOfWeek":["Friday","Saturday"],"opens":"19:30","closes":"22:30"}],
       "acceptsReservations":f"{DOMAIN}{u('reservas',lang)}",
       "hasMenu":f"{DOMAIN}{u('carta',lang)}",
       "sameAs":["https://www.instagram.com/restaurantebaydal","https://www.facebook.com/rtebaydal",
@@ -616,7 +757,7 @@ def layout(lang, page, title, desc, body, extra_head=""):
     <div>
       <img class="ft-logo" src="/assets/img/logo-baydal-vert.webp" alt="Restaurante Baydal — {t['since']}" width="172" height="200" loading="lazy">
       <p>{ADDRESS} · 03710 Calp (Alicante)</p>
-      <p><a href="tel:{TEL}">{TEL_VISIBLE}</a> · <a href="https://wa.me/{WA}">{t['wa_cta']}</a> · <a href="mailto:info@baydal.es">info@baydal.es</a></p>
+      <p><a href="tel:{TEL}">{TEL_VISIBLE}</a> · <a href="https://wa.me/{WA}">{t['wa_cta']}</a> · <a href="mailto:fjbaydal@gmail.com">fjbaydal@gmail.com</a></p>
     </div>
     <div>
       <p class="ft-t">{t['hours_t']}</p>
@@ -641,18 +782,61 @@ def img(name, alt, w, h, lazy=True, cls=""):
     return f'<img src="/assets/img/{name}.webp" alt="{alt}" width="{w}" height="{h}"{l}{c}>'
 
 
+GOOGLE_G = ('<svg class="g-logo" viewBox="0 0 48 48" width="20" height="20" role="img" aria-label="Google">'
+ '<path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>'
+ '<path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>'
+ '<path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>'
+ '<path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>'
+ '</svg>')
+
+
+def _stars(n):
+    n = max(0, min(5, int(n)))
+    return '<span class="estrellas" aria-label="%d/5">%s%s</span>' % (n, "★" * n, "☆" * (5 - n))
+
+
+def reviews_section(lang):
+    """Sección 'Reseñas' con la ficha visual de Google (avatar, Local Guide, logo G,
+    estrellas, enlace). REVIEWS vacío ⇒ '' (web sin cambios)."""
+    if not REVIEWS:
+        return ""
+    r = RES[lang]
+    cards = []
+    for rv in REVIEWS:
+        inicial = rv["autor"].strip()[0]
+        cards.append(
+            '<figure class="resena">'
+            '<div class="resena-top">'
+            '<span class="avatar" style="background:%s">%s</span>'
+            '<div class="resena-quien"><span class="nombre">%s</span><span class="meta">%s</span></div>'
+            '%s'
+            '</div>'
+            '<div class="resena-val">%s<span class="fecha">%s</span></div>'
+            '<blockquote>%s</blockquote>'
+            '</figure>'
+            % (rv["color"], inicial, rv["autor"], rv.get("meta", ""), GOOGLE_G,
+               _stars(rv["estrellas"]), rv.get("fecha", ""), rv["texto"]))
+    inner = r["todas"]
+    if RATING:
+        label = r["nota"].format(r=str(RATING[0]).replace(".", ","), n="%d" % RATING[1])
+        inner = "%s %s" % (_stars(int(round(RATING[0]))), label)
+    nota = '<p class="resenas-nota"><a href="%s" rel="noopener nofollow">%s %s →</a></p>' % (GOOGLE_URL, GOOGLE_G, inner)
+    return ('\n<section class="resenas">\n  <p class="kick">%s</p>\n  <h2>%s</h2>\n  %s\n'
+            '  <div class="resenas-grid">%s</div>\n</section>' % (r["kick"], r["title"], nota, "".join(cards)))
+
+
 def page_home(lang):
     t = T[lang]
     x = EXTRA[lang]
     claims = "".join(f"<li>{c}</li>" for c in x["claims"])
     rare = "".join(f'<li><h3>{n}</h3><p>{d}</p></li>' for n, d in x["rare_items"])
     title, desc = t["meta_home"]
-    dishes = [("pulpo-brasa-plato","Pulpo a la brasa Baydal"),("gamba-hervida","Gamba de Calp"),("fritura-baydal","Fritura Baydal"),("flan-casero","Flan casero")]
+    dishes = [("pulpo-brasa-plato","Pulpo a la brasa Baydal"),("gamba-hervida","Gamba de Calp"),("rape-marinera","Rape a la marinera"),("emperador-plancha","Emperador a la plancha")]
     dish_cards = "".join(f'<figure class="card">{img(n, a, 600, 600)}<figcaption>{a}</figcaption></figure>' for n, a in dishes)
     body = f"""
 <section class="hero-full">
-  {img('arros-del-senyoret', t['hero_h1'], 1300, 1300, lazy=False, cls='hero-bg')}
-  <video class="hero-vid" autoplay muted loop playsinline aria-hidden="true"><source src="https://baydal.es/wp-content/uploads/2026/07/baydal-hero-calp-aereo.mp4" type="video/mp4"></video>
+  {img('hero-calp', t['hero_h1'], 1280, 720, lazy=False, cls='hero-bg')}
+  <video class="hero-vid" autoplay muted loop playsinline aria-hidden="true"><source src="{HERO_VIDEO}" type="video/mp4"></video>
   <div class="hero-veil"></div>
   <div class="hero-inner">
     <p class="kick">{t['since']} · Calp</p>
@@ -691,7 +875,7 @@ def page_home(lang):
 <section class="press">
   <h2>{t['home_press_t']}</h2>
   <blockquote>{t['press_quote']}<cite>{t['press_src']}</cite></blockquote>
-</section>
+</section>{reviews_section(lang)}
 <section class="visit-strip">
   <div>
     <h2>{t['home_visit_t']}</h2>
@@ -737,6 +921,30 @@ def page_carta(lang):
     return layout(lang, "carta", title, desc, body, extra_head=schema_menu(lang))
 
 
+def quiz_section(lang):
+    z = QUIZ[lang]
+    total = len(z["qs"])
+    qs = []
+    for i, q in enumerate(z["qs"]):
+        opts = "".join(
+            '<button type="button" class="quiz-opt"%s>%s</button>' % (' data-ok="1"' if j == q["ok"] else "", a)
+            for j, a in enumerate(q["a"]))
+        qs.append(
+            '<div class="quiz-q"><p class="quiz-qn"><span>%d</span>%s</p>'
+            '<div class="quiz-opts">%s</div>'
+            '<p class="quiz-explain" hidden>%s</p></div>' % (i + 1, q["q"], opts, q["e"]))
+    result = (
+        '<div class="quiz-result" hidden><p class="quiz-score">%s <b class="quiz-score-n">0</b> %s %d</p>'
+        '<p class="quiz-good">%s</p>'
+        '<div class="quiz-cta"><p class="quiz-cta-t">%s</p><p class="quiz-cta-p">%s</p>'
+        '<a class="cta" href="%s">%s</a></div></div>'
+        % (z["done"], z["of"], total, z["good"], z["cta_t"], z["cta_p"], u("reservas", lang), z["cta"]))
+    return (
+        '\n<section class="quiz" data-total="%d"><p class="kick">%s</p><h2>%s</h2>'
+        '<p class="quiz-intro">%s</p>%s%s</section>'
+        % (total, z["kick"], z["title"], z["intro"], "".join(qs), result))
+
+
 def page_senyoret(lang):
     t = T[lang]
     x = EXTRA[lang]
@@ -753,6 +961,7 @@ def page_senyoret(lang):
   <div class="story-tx">{paras}</div>
 </section>
 <section class="faq"><h2>{t['seny_faq_t']}</h2>{faqs}</section>
+{quiz_section(lang)}
 <section class="press"><h2>{x['fuentes_t']}</h2>{fuentes}</section>
 <section class="cta-strip"><a class="cta" href="{wa_reserva(lang)}">{t['seny_cta']}</a></section>"""
     return layout(lang, "senyoret", title, desc, body, extra_head=schema_faq(lang))
@@ -804,6 +1013,8 @@ def page_galeria(lang):
 def page_reservas(lang):
     t = T[lang]
     f = t["res_f"]
+    mm = MEALS[lang]
+    meal_opts = "".join(f'<option value="{k}">{lbl}</option>' for k, lbl in mm["opts"])
     title, desc = t["meta_reservas"]
     body = f"""
 <section class="page-head"><h1>{t['res_h1']}</h1><p class="sub">{t['res_p'].replace('%TEL%', TEL)}</p></section>
@@ -811,7 +1022,8 @@ def page_reservas(lang):
   <form id="res-form" data-wa="{WA}" data-msg="{f['msg']}">
     <label>{f['nombre']}<input type="text" name="nombre" required autocomplete="name"></label>
     <label>{f['fecha']}<input type="date" name="fecha" required></label>
-    <label>{f['hora']}<input type="time" name="hora" required min="10:00" max="23:00"></label>
+    <label>{mm['label']}<select name="comida" id="res-meal" required><option value="" selected disabled>{mm['ph']}</option>{meal_opts}</select></label>
+    <label>{f['hora']}<select name="hora" id="res-hora" required><option value="" selected disabled>—</option></select></label>
     <label>{f['pax']}<input type="number" name="pax" required min="1" max="40" value="2"></label>
     <button class="cta" type="submit">{f['enviar']}</button>
   </form>

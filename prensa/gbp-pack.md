@@ -8,7 +8,7 @@
 - Web: https://baydal.es
 - Enlace de reservas (campo "Reservas" sin partner): https://baydal.es/reservas/
 - Fecha de apertura: julio de 1941
-- Horario: Ma–Do 10:00–16:00 y 19:00–23:00 · Lunes cerrado (marcar "abierto los lunes" solo en temporada de verano)
+- Horario: L–J 8:00–16:30 · V 8:00–16:30 y 19:30–22:30 · S 7:30–16:30 y 19:30–22:30 · D 7:30–16:30
 
 ## Categorías
 - Principal: Arrocería

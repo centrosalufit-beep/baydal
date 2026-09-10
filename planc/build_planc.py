@@ -33,6 +33,13 @@ def main():
     # 1ª pasada: numerar assets y construir el mapa de reescritura.
     # nginx de Hostinger corta las rutas con extensión antes de llegar a PHP,
     # así que los assets se sirven en rutas SIN extensión: /a/<n>
+    # robots.txt y sitemap.xml deben servirse en su ruta canónica (los rastreadores
+    # las piden ahí), no en /a/<n>: se registran por su ruta real y NO se meten en
+    # 'mapa', así no se reescriben sus referencias (robots sigue apuntando a
+    # /sitemap.xml). El edge corta .txt antes de PHP → /robots.txt seguirá dando 404
+    # (aceptable: = rastrea todo); .xml sí llega, así que /sitemap.xml funcionará.
+    CANONICOS = {"robots.txt": "/robots.txt", "sitemap.xml": "/sitemap.xml"}
+
     assets, assets_idx, mapa = [], {}, {}
     n_asset = 0
     for base, _dirs, files in os.walk(DIST):
@@ -44,8 +51,10 @@ def main():
             n_asset += 1
             mime = MIMES.get(os.path.splitext(f)[1].lower()) or mimetypes.guess_type(f)[0] or "application/octet-stream"
             assets.append((n_asset, full, mime))
-            assets_idx[f"/a/{n_asset}"] = n_asset
-            mapa["/" + rel] = f"/a/{n_asset}"
+            canon = CANONICOS.get(rel)
+            assets_idx[canon or f"/a/{n_asset}"] = n_asset
+            if not canon:
+                mapa["/" + rel] = f"/a/{n_asset}"
 
     def reescribir(texto):
         for viejo, nuevo in mapa.items():
